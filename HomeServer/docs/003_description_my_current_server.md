@@ -34,7 +34,7 @@
 ## 🐧 2. Программная экосистема
 
 ### Операционная система
-- **Ubuntu Server 24.04 LTS** (ядро 7.0.0-27-generic)
+- **Ubuntu Server 26.04 LTS** (ядро 7.0.0-27-generic)
 
 ### Ключевые установленные сервисы
 
@@ -55,14 +55,66 @@
 | **Samba** | Файловый доступ по локальной сети | Прямая установка |
 
 ### Сеть и безопасность
-- **SSH**: порт изменён на 2222
+- **SSH**: порт изменён на нестадартный 2222
 - **UFW**: брандмауэр
 - **Fail2Ban**: защита от брутфорса
 - **Cloudflare Tunnel**: альтернативный способ внешнего доступа
 
 ---
 
-## 🚨 3. Главная проблема: Nextcloud Error 500
+## 🛠️ 3. Настройка NetBird
+
+После тестирования Cloudflare и использования tunnels
+решил перейти на другой ресурс - решил попробовать есть белый IP
+
+### Установка на VPS (RSB)
+
+```bash
+curl -fsSL https://github.com/netbirdio/netbird/releases/latest/download/getting-started.sh | bash
+```
+
+**Выбор в процессе установки**:
+- Reverse proxy: `[0] Traefik`
+- Включить NetBird Proxy: `y`
+
+**DNS-записи**:
+- A: `netbird.ваш-домен` → IP_VPS
+- CNAME: `*.netbird.ваш-домен` → `netbird.ваш-домен`
+
+### Установка клиента на домашнем сервере (HS)
+
+```bash
+curl -fsSL https://pkgs.netbird.io/install.sh | sh
+netbird up --setup-key YOUR_SETUP_KEY
+```
+
+**Конфиг клиента**: `/etc/netbird/config.yaml`
+```yaml
+management_url: "https://ваш-домен.netbird"
+```
+
+**Автозапуск**:
+```bash
+sudo netbird service uninstall
+sudo netbird service install
+sudo netbird service start
+```
+
+### Настройка Reverse Proxy для поддоменов
+
+1. В панели NetBird: **Reverse Proxy → Custom Domains → Add Domain**
+2. Добавить базовый домен (например, `proxy.ваш-домен`)
+3. DNS-верификация: CNAME `*.proxy.ваш-домен` → `netbird.ваш-домен`
+4. **Reverse Proxy → Services → Add Service**:
+   - Subdomain: `nextcloud`
+   - Domain: `proxy.ваш-домен`
+   - Target: `http://IP_сервера:28080` (или `http://nextcloud:80`)
+
+Доступ по адресу: `https://nextcloud.proxy.ваш-домен`
+
+---
+
+## 🚨 3. Главная проблема c  Nextcloud:  Error 500
 
 ### Описание проблемы
 После смены домена с `nextcloud.envai.win` на `nextcloud.nb.envai.win` и перехода с Cloudflare/SSH-туннеля на NetBird, Nextcloud перестал открываться. При попытке зайти на `/login` выдавалась ошибка HTTP 500 без каких-либо следов в логах.
@@ -111,54 +163,7 @@
 
 ---
 
-## 🛠️ 4. Настройка NetBird
 
-### Установка на VPS (RSB)
-
-```bash
-curl -fsSL https://github.com/netbirdio/netbird/releases/latest/download/getting-started.sh | bash
-```
-
-**Выбор в процессе установки**:
-- Reverse proxy: `[0] Traefik`
-- Включить NetBird Proxy: `y`
-
-**DNS-записи**:
-- A: `netbird.ваш-домен` → IP_VPS
-- CNAME: `*.netbird.ваш-домен` → `netbird.ваш-домен`
-
-### Установка клиента на домашнем сервере (HS)
-
-```bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
-netbird up --setup-key YOUR_SETUP_KEY
-```
-
-**Конфиг клиента**: `/etc/netbird/config.yaml`
-```yaml
-management_url: "https://ваш-домен.netbird"
-```
-
-**Автозапуск**:
-```bash
-sudo netbird service uninstall
-sudo netbird service install
-sudo netbird service start
-```
-
-### Настройка Reverse Proxy для поддоменов
-
-1. В панели NetBird: **Reverse Proxy → Custom Domains → Add Domain**
-2. Добавить базовый домен (например, `proxy.ваш-домен`)
-3. DNS-верификация: CNAME `*.proxy.ваш-домен` → `netbird.ваш-домен`
-4. **Reverse Proxy → Services → Add Service**:
-   - Subdomain: `nextcloud`
-   - Domain: `proxy.ваш-домен`
-   - Target: `http://IP_сервера:28080` (или `http://nextcloud:80`)
-
-Доступ по адресу: `https://nextcloud.proxy.ваш-домен`
-
----
 
 ## 📚 5. Дополнительные сервисы
 
@@ -259,15 +264,3 @@ ini_set('display_errors', 1);
 
 ---
 
-## 🎯 8. Планы на будущее
-
-- Установка RTX 3090 для локального ИИ-ассистента
-- Запуск Ollama для работы с LLM-моделями
-- Расширение медиатеки в Jellyfin
-- Интеграция Authelia для единой аутентификации
-
----
-
-## 🙏 Благодарность
-
-Особая благодарность пользователю, который нашёл корень проблемы с `forwarded_for_headers` — это был сложный и неочевидный баг, требующий глубокого понимания внутреннего устройства Nextcloud и PHP-обработки ошибок. Спасибо за терпение и настойчивость в решении проблемы.
