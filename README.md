@@ -19,34 +19,60 @@
 
 ### [Basic Linux](./Projects_School21/DO1_Basic_Linux/BASIC_LINUX_RUS.MD)
 
+### [Linux Networking](./Projects_School21/DO2_LinuxNetwork/LINUX_NETWORKING.md)
+
 
 ## Мой первый собственный HomeServer
 
 Для собственных нужд я определился с целями с чтобы хотелось для использования и взял старый ноутбук вот с [такими параметрами](./HomeServer/docs/000-first-goal-and-specs.md)
 
-### Создание загрузочной флэшки и подготовка ноутбука
+### 1 От настройки загрузочных флэшек, подготвоки компьютера , установка OS
+
+#### 1.1 Создание загрузочной флэшки и подготовка ноутбука
 
 Определился с [загрузочной usb](./HomeServer/docs/01-create_usb_flash_install-ubuntu.md) и первой OS Ubuntu Linux 2004 LTS - которую успешно установил на свое "старое железо"
 
-### [Первое подключение и настройках параметров](./HomeServer/docs/03-first-connect_linux.md)
 
-### [Безопасное соединение и настройки SSH](./HomeServer/docs/04-ssh-setup.md)
+#### 1.2 [Первое подключение и настройках параметров](./HomeServer/docs/03-first-connect_linux.md)
 
-### [Докер сервисы](./HomeServer/docs/05-docker-services.md)
+### 2  Безопасное соединение и настройки SSH соединений
 
-### [Cloudflare туннель](./HomeServer/docs/06-cloudflare-tunnel.md)
+Настроим подключение по SSH - создадим ключ
+
+#### 2.1  [настройки SSH соединений](./HomeServer/docs/04-ssh-setup.md)
+
+#### 2.2 Безопасность Firewall
+
+настроим Firewall Fail2ban 
+
+[Firewall, Fail2ban ](./HomeServer/docs/09-security.md)
+
+Дополнительная безопасность можно настроить g‼️port knocking‼️
+
+
+### 3 Docker services
+
+#### [Докер сервисы](./HomeServer/docs/05-docker-services.md)
+
+### 4 Доступы к сервисам( Tуннели )
+
+#### 4.1 [Cloudflare туннель](./HomeServer/docs/06-cloudflare-tunnel.md)
+#### 4.2 [Реверс туннели](./HomeServer/docs/14-reverse-tunnel.md)
+#### 4.3 [Прокси](./HomeServer/docs/11-openai-proxy.md)
+#### 4.4 [NetBird](./HomeServer/docs/21_install_netbird.md)
+
+### [BACKUPS](./HomeServer/docs/15-backup.md)
+### [Восстановление PostgresSQL](./HomeServer/docs/19_recovery_postgresql_from_backup.md)
+
+
 
 ### [Samba](./HomeServer/docs/07-samba.md)
 
-### [BACKUPS](./HomeServer/docs/15-backup.md)
-
-### [Восстановление PostgresSQL](./HomeServer/docs/19_recovery_postgresql_from_backup.md)
-
 ### [Опыт с Matrix и Coturn](./HomeServer/docs/08-matrix-coturn.md)
 
-### [Реверс туннели](./HomeServer/docs/14-reverse-tunnel.md)
 
-### [Прокси](./HomeServer/docs/11-openai-proxy.md)
+
+
 
 ### [VaultWarden](./HomeServer/docs/12-vaultwarden.md)
 
@@ -58,14 +84,14 @@
 
 ### [1Panel](./HomeServer/docs/20_install_1panel.md)
 
-### [NetBird](./HomeServer/docs/21_install_netbird.md)
+
 ### [OLLAMA](./HomeServer/docs/22_install_llm_ollama.md)
 ### [qBittorrent](./HomeServer/docs/23_install_qbittorrent.md)
 ### [Jellifin](./HomeServer/docs/24_install_Jellyfin.md)
 ### [Проверка на майнеров](./HomeServer/docs/25_check_mainers.md)
 
 ### [Проблемы и решения](./HomeServer/docs/10-troubleshooting.md)
-### [Безопасность](./HomeServer/docs/09-security.md)
+
 ### [Очень полезные команды](./HomeServer/docs/17-useful-commands.md)
 
 
