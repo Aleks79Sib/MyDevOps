@@ -90,9 +90,9 @@ cat /etc/passwd
 
 ![Вывод команды cat /etc/passwd](../DO1_Basic_Linux/docs/screenshots/basic_commands/2_2_Command_part2_VirtualBox_Ubuntu2004server_23_10_2025_11_56_26.png)
 
-### 2.3. Настройка сети ОС
+### 2.2. Настройка hostname
 
-- Задаем название машины вида user-1 следующей командой
+- Задаем hostname название машины вида user-1 следующей командой
 
 ```bash
 sudo hostnamectl set-hostname user-1
@@ -106,19 +106,10 @@ hostnamectl
 
 ![Установка hostname](../DO1_Basic_Linux/docs/screenshots/basic_commands/3_1_hostname_user1_VirtualBox_Ubuntu2004server_23_10_2025_12_05_56.png)
 
-- Установливаем временную зону, соответствующую твоему текущему местоположению
 
-```bash
-sudo timedatectl set-timezone Europe/Moscow
-```
+### 2.4 Сетевые интерфейсы, настройка сети
 
-- Проверяем какая установилась временная зона
-
-```bash
-timedatectl
-```
-
-![Проверка временной зоны](../DO1_Basic_Linux/docs/screenshots/basic_commands/3_2_timezone_VirtualBox_Ubuntu2004server_23_10_2025_12_13_09.png)
+[Конфигурация сетевых интерфейсов](./docs/RUS/OS_network_configure_rus.md)
 
 - Вывели названия сетевых интерфейсов с помощью консольной команды
 
@@ -197,7 +188,7 @@ sudo netplan apply
 
 ![Пингование хостов](../DO1_Basic_Linux/docs/screenshots/basic_commands/3_9_ping_VirtualBox_Ubuntu2004server_23_10_2025_13_49_37.png)
 
-### 2.4. Обновление ОС
+### 2.5. Обновление ОС
 
 - Обновили системные пакеты до последней на момент выполнения задания версии.
 
@@ -250,11 +241,23 @@ hostnamectl
 
 ### 2.6. Установка и настройка службы времени
 
-- Выводии время часового пояса, в котором сейчас находимся.
+[настройка времени](./docs/RUS/time_management_rus.md)
+
+- Установливаем временную зону, соответствующую твоему текущему местоположению
+
+
+```bash
+sudo timedatectl set-timezone Europe/Moscow
+```
+
+- Проверяем какая установилась временная зона и часовой пояс
 
 ```bash
 timedatectl
 ```
+
+![Проверка временной зоны](../DO1_Basic_Linux/docs/screenshots/basic_commands/3_2_timezone_VirtualBox_Ubuntu2004server_23_10_2025_12_13_09.png)
+
 
 - Настроили службу автоматической синхронизации времени и проверили.
 
@@ -383,6 +386,8 @@ mcedit test_mcedit.txt
 
 ### 2.8. Установка и базовая настройка сервиса **SSHD**
 
+[SSHD](./docs/RUS/SSHD_rus.md)
+
 - Установили службу SSHd: Проверили обновления
 
 ```bash
@@ -458,6 +463,8 @@ sudo apt install net-tools -y
 
 ### 2.9. Установка и использование утилит **top**, **htop**
 
+[TOP, HTOP](./docs/RUS/top_and_htop_rus.md)
+
 - Установил и запустил утилиты top(procps) и htop: 
 
 ```bash
@@ -518,6 +525,8 @@ sudo apt install procps htop -y
 
 ### 2.10. Использование утилиты **fdisk**
 
+[утилита FDISK](./docs/RUS/fdisk_rus.md)
+
 - Запустили команду
 
 ```bash
@@ -531,6 +540,8 @@ sudo fdisk -l
 ![Report](../DO1_Basic_Linux/docs/screenshots/basic_commands/10_1_swap_VirtualBox_Ubuntu2004server_25_10_2025_12_41_26.png)
 
 ### 2.11. Использование утилиты **df** 
+
+[утилита DF](./docs/RUS/df_rus.md)
 
 - Запустили команду
 
@@ -564,6 +575,8 @@ df -Th
 
 ### 2.12. Использование утилиты **du**
 
+[утилита DU](./docs/RUS/du_rus.md)
+
 - Запустили команду 
 
 ```bash
@@ -596,6 +609,8 @@ sudo du -sh /var/log/* | sort -nr | head -n 30
 
 ### 2.13. Установка и использование утилиты **ncdu**
 
+[утилита NCDU](./docs/RUS/ncdu_rus.md)
+
 - Установи утилиту ncdu.
 
 ![Report](../DO1_Basic_Linux/docs/screenshots/basic_commands/13_1_ncdu_VirtualBox_Ubuntu2004server_25_10_2025_14_42_53.png)
@@ -611,6 +626,8 @@ sudo du -sh /var/log/* | sort -nr | head -n 30
 - Размеры примерно совпадают с полученными в [в части 2.12](#212-использование-утилиты-du).
 
 ### 2.14. Работа с системными журналами
+
+[Работа с логами](./docs/RUS/logs_rus.md)
 
 Открыли для просмотра:
 
@@ -644,6 +661,8 @@ sudo systemctl restart sshd
 
 
 ### 2.15. Использование планировщика заданий **CRON**
+
+[Планировщик CRON](./docs/RUS/CRON_rus.md)
 
 - Открыли редактор crontab
 
