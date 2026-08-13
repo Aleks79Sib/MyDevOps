@@ -25,7 +25,7 @@
 
 Рассмотрим примеры. Если указать в качестве входных данных IPv4-адрес вашего хоста, вы получите следующий результат:
 
-<img src="../misc/images/ipcalc1.png" alt="network_route" width="500"/>
+<img src="../images/ipcalc1.png" alt="network_route" width="500"/>
 
 **ipcalc** сам подбирает сетевую маску хоста, а результат получается вполне себе понятным. Плюс **ipcalc** в том, что для каждого адреса он выдает двоичный эквивалент.
 
@@ -33,7 +33,7 @@
 
 Также можно задать в качестве входного параметра сетевую маску. Например:
 
-<img src="../misc/images/ipcalc2.png" alt="network_route" width="500"/>
+<img src="../images/ipcalc2.png" alt="network_route" width="500"/>
 
 К сожалению, двоичную форму адреса передать на вход **ipcalc** нельзя :(
 
@@ -41,5 +41,5 @@
 
 Одна из самых полезных функций ipcalc — вычисление сегментов сети. Ниже пример того, как это работает при назначении 10 и 20 адресов двум разным подсетям:
 
-<img src="../misc/images/ipcalc3.png" alt="network_route" width="500"/>
+<img src="../images/ipcalc3.png" alt="network_route" width="500"/>
 

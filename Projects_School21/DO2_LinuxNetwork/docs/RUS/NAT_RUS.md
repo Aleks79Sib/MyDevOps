@@ -3,7 +3,7 @@
 **NAT** — аббревиатура для «Network Address Translation», т.е. «преобразование сетевых адресов».  
 **NAT** возникает в случае, когда один из IP-адресов меняется в заголовке IP-пакета: либо IP-адрес источника, либо IP-адрес получателя.
 
-<img src="../misc/images/nat.png" alt="network_route" width="500"/>
+<img src="../images/nat.png" alt="network_route" width="500"/>
 
 Параметр |	**SNAT**|	**DNAT**
 ---------|----------|-----------

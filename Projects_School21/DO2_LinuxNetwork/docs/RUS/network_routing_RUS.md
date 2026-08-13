@@ -1,6 +1,6 @@
 ## Маршрутизация. Пример.
 
-<img src="../misc/images/network_route.png" alt="network_route" width="500"/>
+<img src="../images/network_route.png" alt="network_route" width="500"/>
 
 Рассмотрим на рисунке пример структуры с несколькими подсетями.
 
