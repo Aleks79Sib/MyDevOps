@@ -17,33 +17,33 @@
 
 ## Проекты по направлению Devops
 
-### [Basic Linux](./Projects_School21/DO1_Basic_Linux/BASIC_LINUX_RUS.MD)
+### 1. [Basic Linux](./Projects_School21/DO1_Basic_Linux/BASIC_LINUX_RUS.MD)
 
-### [Linux Networking](./Projects_School21/DO2_LinuxNetwork/LINUX_NETWORKING.md)
+### 2. [Linux Networking](./Projects_School21/DO2_LinuxNetwork/LINUX_NETWORKING.md)
 
-### [Bash Scripts](./Projects_School21/DO3_Monitoring/Bash_scripts_Linux/BASH_SCRIPTS.MD)
+### 3. [Bash Scripts](./Projects_School21/DO3_Monitoring/Bash_scripts_Linux/BASH_SCRIPTS.MD)
 
 
 ## Мой первый собственный HomeServer
 
 Для собственных нужд я определился с целями с чтобы хотелось для использования и взял старый ноутбук вот с [такими параметрами](./HomeServer/docs/000-first-goal-and-specs.md)
 
-### 1 От настройки загрузочных флэшек, подготвоки компьютера , установка OS
+### 1. От настройки загрузочных флэшек, подготвоки компьютера , установка OS
 
-#### 1.1 Создание загрузочной флэшки и подготовка ноутбука
+#### 1.1. Создание загрузочной флэшки и подготовка ноутбука
 
 Определился с [загрузочной usb](./HomeServer/docs/01-create_usb_flash_install-ubuntu.md) и первой OS Ubuntu Linux 2004 LTS - которую успешно установил на свое "старое железо"
 
 
-#### 1.2 [Первое подключение и настройках параметров](./HomeServer/docs/03-first-connect_linux.md)
+#### 1.2. [Первое подключение и настройках параметров](./HomeServer/docs/03-first-connect_linux.md)
 
-### 2  Безопасное соединение и настройки SSH соединений
+### 2.  Безопасное соединение и настройки SSH соединений
 
 Настроим подключение по SSH - создадим ключ
 
-#### 2.1  [настройки SSH соединений](./HomeServer/docs/04-ssh-setup.md)
+#### 2.1.  [настройки SSH соединений](./HomeServer/docs/04-ssh-setup.md)
 
-#### 2.2 Безопасность Firewall
+#### 2.2. Безопасность Firewall
 
 настроим Firewall Fail2ban 
 
@@ -52,16 +52,16 @@
 Дополнительная безопасность можно настроить g‼️port knocking‼️
 
 
-### 3 Docker services
+### 3. Docker services
 
 #### [Докер сервисы](./HomeServer/docs/05-docker-services.md)
 
-### 4 Доступы к сервисам( Tуннели )
+### 4. Доступы к сервисам( Tуннели )
 
-#### 4.1 [Cloudflare туннель](./HomeServer/docs/06-cloudflare-tunnel.md)
-#### 4.2 [Реверс туннели](./HomeServer/docs/14-reverse-tunnel.md)
-#### 4.3 [Прокси](./HomeServer/docs/11-openai-proxy.md)
-#### 4.4 [NetBird](./HomeServer/docs/21_install_netbird.md)
+#### 4.1. [Cloudflare туннель](./HomeServer/docs/06-cloudflare-tunnel.md)
+#### 4.2. [Реверс туннели](./HomeServer/docs/14-reverse-tunnel.md)
+#### 4.3. [Прокси](./HomeServer/docs/11-openai-proxy.md)
+#### 4.4. [NetBird](./HomeServer/docs/21_install_netbird.md)
 
 ### [BACKUPS](./HomeServer/docs/15-backup.md)
 ### [Восстановление PostgresSQL](./HomeServer/docs/19_recovery_postgresql_from_backup.md)
@@ -71,10 +71,6 @@
 ### [Samba](./HomeServer/docs/07-samba.md)
 
 ### [Опыт с Matrix и Coturn](./HomeServer/docs/08-matrix-coturn.md)
-
-
-
-
 
 ### [VaultWarden](./HomeServer/docs/12-vaultwarden.md)
 
