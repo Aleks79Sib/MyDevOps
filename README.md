@@ -9,7 +9,8 @@
 - [Проекты Школы 21](./Projects_School21)
 
 - [Проект Домашний сервер](./HomeServer)
-где развернул собственный домашний сервер и на нем тестировал различные selfhost решения 
+
+где развернул собственный домашний сервер и на нем тестировал различные программы open-source решения 
 
 разворачивал некоторые программы на VPS для друзей, и иногда для себя - когда нужен "белый ip"
 
@@ -26,7 +27,9 @@
 
 ## Мой первый собственный HomeServer
 
-Для собственных нужд я определился с целями с чтобы хотелось для использования и взял старый ноутбук вот с [такими параметрами](./HomeServer/docs/000-first-goal-and-specs.md)
+Для собственных нужд взял старый ноутбук [такими параметрами](./HomeServer/docs/000-first-goal-and-specs.md) для тестирования возможностей OS Ubuntu Linux и получения опыта.
+
+Определился с операционной системой и минимальным количеством программ для устанвоки и администрирования
 
 ### 1. От настройки загрузочных флэшек, подготвоки компьютера , установка OS
 
@@ -35,13 +38,13 @@
 Определился с [загрузочной usb](./HomeServer/docs/01-create_usb_flash_install-ubuntu.md) и первой OS Ubuntu Linux 2004 LTS - которую успешно установил на свое "старое железо"
 
 
-#### 1.2. [Первое подключение и настройках параметров](./HomeServer/docs/03-first-connect_linux.md)
+#### 1.2. [Первое подключение и настройках параметров системы](./HomeServer/docs/03-first-connect_linux.md)
 
 ### 2.  Безопасное соединение и настройки SSH соединений
 
 Настроим подключение по SSH - создадим ключ
 
-#### 2.1.  [настройки SSH соединений](./HomeServer/docs/04-ssh-setup.md)
+#### 2.1.  [Настройки SSH соединений](./HomeServer/docs/04-ssh-setup.md)
 
 #### 2.2. Безопасность Firewall
 
@@ -52,7 +55,7 @@
 Дополнительная безопасность можно настроить g‼️port knocking‼️
 
 
-### 3. Docker services
+### 3. Docker services (docker compose)
 
 #### [Докер сервисы](./HomeServer/docs/05-docker-services.md)
 
@@ -63,34 +66,45 @@
 #### 4.3. [Прокси](./HomeServer/docs/11-openai-proxy.md)
 #### 4.4. [NetBird](./HomeServer/docs/21_install_netbird.md)
 
-### [BACKUPS](./HomeServer/docs/15-backup.md)
-### [Восстановление PostgresSQL](./HomeServer/docs/19_recovery_postgresql_from_backup.md)
+
+### 5. Создание резервных копий и восстановление из backups
+
+- [BACKUPS](./HomeServer/docs/15-backup.md)
+
+- [Восстановление PostgresSQL](./HomeServer/docs/19_recovery_postgresql_from_backup.md)
 
 
+### 6. Полезные приложения 
 
-### [Samba](./HomeServer/docs/07-samba.md)
+- Управление системой [1Panel](./HomeServer/docs/20_install_1panel.md)
 
-### [Опыт с Matrix и Coturn](./HomeServer/docs/08-matrix-coturn.md)
+- [Samba](./HomeServer/docs/07-samba.md)
 
-### [VaultWarden](./HomeServer/docs/12-vaultwarden.md)
+- [Опыт с Matrix и Coturn](./HomeServer/docs/08-matrix-coturn.md)
 
-### [Monitoring](./HomeServer/docs/13-monitoring.md)
+- Секреты [VaultWarden](./HomeServer/docs/12-vaultwarden.md)
 
-### [Монтирование дисков](./HomeServer/docs/16-disk-mount-raid_array.md)
+- [Монтирование дисков](./HomeServer/docs/16-disk-mount-raid_array.md)
+- [qBittorrent](./HomeServer/docs/23_install_qbittorrent.md)
+- [Jellifin](./HomeServer/docs/24_install_Jellyfin.md)
 
-### [Agent PI](./HomeServer/docs/18_install_agent_pi_with_docker.md)
+### 7. Развертывание ИИ агентов и различные модели 
 
-### [1Panel](./HomeServer/docs/20_install_1panel.md)
+*моя любимая тема с ИИ*
 
+- [Agent PI](./HomeServer/docs/18_install_agent_pi_with_docker.md)
+- [OLLAMA](./HomeServer/docs/22_install_llm_ollama.md)
 
-### [OLLAMA](./HomeServer/docs/22_install_llm_ollama.md)
-### [qBittorrent](./HomeServer/docs/23_install_qbittorrent.md)
-### [Jellifin](./HomeServer/docs/24_install_Jellyfin.md)
-### [Проверка на майнеров](./HomeServer/docs/25_check_mainers.md)
+### 8. [Monitoring](./HomeServer/docs/13-monitoring.md)
 
-### [Проблемы и решения](./HomeServer/docs/10-troubleshooting.md)
+### 9. Проблемы и решения
 
-### [Очень полезные команды](./HomeServer/docs/17-useful-commands.md)
+С чем пришлось столкнуться и как проверить и исправить
+
+- [Проблемы и решения](./HomeServer/docs/10-troubleshooting.md)
+- [Проверка на майнеров](./HomeServer/docs/25_check_mainers.md)
+
+### 10. [Очень полезные команды](./HomeServer/docs/17-useful-commands.md)
 
 
 
