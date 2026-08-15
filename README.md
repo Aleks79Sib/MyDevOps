@@ -21,6 +21,8 @@
 
 ### [Linux Networking](./Projects_School21/DO2_LinuxNetwork/LINUX_NETWORKING.md)
 
+### [Bash Scripts](./Projects_School21/DO3_Monitoring/Bash_scripts_Linux/BASH_SCRIPTS.MD)
+
 
 ## Мой первый собственный HomeServer
 
