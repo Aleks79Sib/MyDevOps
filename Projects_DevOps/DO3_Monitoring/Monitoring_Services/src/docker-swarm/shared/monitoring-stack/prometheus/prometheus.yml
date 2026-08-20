@@ -1,0 +1,93 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+rule_files:
+  - '/etc/prometheus/alert_rules.yml'
+
+scrape_configs:
+
+  # Сам Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # ---------- Java-сервисы приложения (Micrometer /actuator/prometheus) ----------
+  # Названия — это service name из stack-файла приложения (та же overlay-сеть)
+  - job_name: 'app-services'
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - 'booking-service:8083'
+        labels:
+          service: booking-service
+      - targets:
+          - 'session-service:8081'
+        labels:
+          service: session-service
+      - targets:
+          - 'gateway-service:8087'
+        labels:
+          service: gateway-service
+      - targets:
+          - 'report-service:8086'
+        labels:
+          service: report-service
+
+  # ---------- node_exporter (метрики хостов: CPU, RAM, диск) ----------
+  # mode: global -> по одному контейнеру на КАЖДОЙ ноде Swarm.
+  # dns_sd через "tasks.<service>" вернёт IP каждого запущенного таска (= каждой ноды)
+  - job_name: 'node-exporter'
+    dns_sd_configs:
+      - names:
+          - 'tasks.node-exporter'
+        type: 'A'
+        port: 9100
+
+  # ---------- cAdvisor (метрики контейнеров: CPU/RAM/сеть по каждому контейнеру) ----------
+  - job_name: 'cadvisor'
+    dns_sd_configs:
+      - names:
+          - 'tasks.cadvisor'
+        type: 'A'
+        port: 8080
+
+  # blackbox_exporter: внутренние сервисы приложения
+  - job_name: 'blackbox-http'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - http://gateway-service:8087/api/v1/gateway/hotels
+          - http://session-service:8081/actuator/health
+          - http://booking-service:8083/actuator/health
+          - http://report-service:8086/actuator/health
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # blackbox_exporter: внешняя проверка (google.com)
+  - job_name: 'blackbox-external'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - https://google.com
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115

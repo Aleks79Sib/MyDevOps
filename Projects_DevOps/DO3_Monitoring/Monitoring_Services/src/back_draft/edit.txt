@@ -1,0 +1,243 @@
+Хороший вопрос — нет, не только `Statistics`. Вот полный список, где именно я что-то добавил или поменял (пути — как в вашем архиве, от корня `services/`):
+
+## booking-service
+| Файл | Что сделано |
+|---|---|
+| `booking-service/pom.xml` | добавлены 2 зависимости |
+| `booking-service/src/main/resources/application.properties` | добавлены настройки actuator |
+| `booking-service/src/main/java/.../bookingservice/Statistics/AppMetrics.java` | **новый файл** — счётчики |
+| `booking-service/src/main/java/.../bookingservice/Statistics/QueueProducer.java` | изменён — вызов счётчика после отправки в RabbitMQ |
+| `booking-service/src/main/java/.../bookingservice/Service/BookingServiceImplementation.java` | изменён — вызов счётчика после успешного создания брони |
+
+## session-service
+| Файл | Что сделано |
+|---|---|
+| `session-service/pom.xml` | добавлены 2 зависимости |
+| `session-service/src/main/resources/application.properties` | добавлены настройки actuator |
+| `session-service/src/main/java/.../sessionservice/Statistics/AppMetrics.java` | **новый файл** — счётчик |
+| `session-service/src/main/java/.../sessionservice/Controller/SessionController.java` | изменён — вызов счётчика в методе `authorize()` |
+
+## gateway-service
+| Файл | Что сделано |
+|---|---|
+| `gateway-service/pom.xml` | добавлены 2 зависимости |
+| `gateway-service/src/main/resources/application.properties` | добавлены настройки actuator |
+| `gateway-service/src/main/java/.../gatewayservice/Statistics/GatewayMetricsFilter.java` | **новый файл** — фильтр, считающий все запросы |
+
+(В gateway-service я не трогал контроллеры вообще — фильтр перехватывает запросы сам, без правок существующего кода.)
+
+## report-service
+| Файл | Что сделано |
+|---|---|
+| `report-service/pom.xml` | добавлены 2 зависимости |
+| `report-service/src/main/resources/application.properties` | добавлены настройки actuator |
+| `report-service/src/main/java/.../reportservice/Statistics/AppMetrics.java` | **новый файл** — счётчик |
+| `report-service/src/main/java/.../reportservice/Statistics/QueueConsumer.java` | изменён — вызов счётчика после обработки сообщения |
+
+Итого: **4 новых файла** (по одному `AppMetrics.java`/`GatewayMetricsFilter.java` в каждом сервисе) + **4 изменённых `.java`-файла** (`QueueProducer`, `BookingServiceImplementation`, `SessionController`, `QueueConsumer`) + 4×`pom.xml` + 4×`application.properties`.
+
+Папку `hotel-service`, `payment-service`, `loyalty-service` я не трогал — по заданию метрики нужны только для этих пяти вещей (RabbitMQ send/process, бронирования, gateway-запросы, авторизация), они все живут в booking/session/gateway/report.
+
+
+
+ALERT_MANAGER
+
+Вот конфиг только для Alertmanager — три части: сам сервис в стек, конфиг маршрутизации и правила алертов. Плюс что нужно добавить в уже существующий `prometheus.yml`, чтобы он вообще знал про Alertmanager.
+
+## 1. Сервис в `docker-stack-monitoring.yml` (вставить в `services:`)
+
+```yaml
+  # ---------- Alertmanager (доставка оповещений о критических событиях) ----------
+  alertmanager:
+    image: prom/alertmanager:latest
+    configs:
+      - source: alertmanager_config
+        target: /etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    volumes:
+      - alertmanager_data:/alertmanager
+    ports:
+      - "9093:9093"
+    networks:
+      - monitoring
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+```
+
+**И два дополнения в конце файла:**
+
+В `volumes:`:
+```yaml
+volumes:
+  prometheus_data:
+  loki_data:
+  grafana_data:
+  alertmanager_data:      # ← добавить
+```
+
+В `configs:`:
+```yaml
+configs:
+  ...
+  alertmanager_config:            # ← добавить
+    file: ./alertmanager/alertmanager.yml
+  prometheus_alert_rules:         # ← добавить (правила тоже монтируются как config)
+    file: ./prometheus/alert_rules.yml
+```
+
+## 2. Правки в `prometheus/prometheus.yml` (уже существующий файл)
+
+Добавить блок `alerting:` и `rule_files:` — Prometheus сам не отправляет алерты, он только вычисляет условия и передаёт их в Alertmanager:
+
+```yaml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+
+rule_files:
+  - '/etc/prometheus/alert_rules.yml'
+
+scrape_configs:
+  # ... (все ваши существующие job'ы без изменений)
+```
+
+Не забудьте пробросить файл правил в контейнер Prometheus — в блоке `prometheus:` добавить ещё один `configs`:
+```yaml
+  prometheus:
+    ...
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+      - source: prometheus_alert_rules          # ← добавить
+        target: /etc/prometheus/alert_rules.yml  # ← добавить
+```
+
+## 3. Новый файл `prometheus/alert_rules.yml`
+## 4. Новый файл `alertmanager/alertmanager.yml`
+В архиве — только 2 новых файла (`alertmanager/alertmanager.yml`, `prometheus/alert_rules.yml`), сам `docker-stack-monitoring.yml` и `prometheus.yml` я не трогал — как договорились, добавите сервис и блок `alerting:` сами по сниппетам выше.
+
+## Что значат ключевые части конфига
+
+**`alertmanager.yml`:**
+- `route: group_by: ['alertname']` — если сработает сразу несколько алертов с одним и тем же именем (например, `HighServiceCPU` на трёх сервисах разом) — они склеятся в **одно** уведомление, а не завалят вас тремя письмами подряд.
+- `group_wait: 10s` — подождать 10 секунд перед первой отправкой группы, вдруг за это время придёт ещё что-то похожее, чтобы объединить.
+- `repeat_interval: 1h` — если проблема не устранена, повторно напомнить через час (иначе шлёт один раз и молчит).
+- `inhibit_rules` — если уже горит `critical`-алерт по конкретному инстансу, не дублировать по нему же `warning`-алерт (чтобы не заваливать оповещениями по одной и той же причине).
+
+**`alert_rules.yml`:**
+- `for: 1m` / `for: 2m` — условие должно быть истинным **непрерывно** это время, прежде чем алерт реально станет `firing`. Без этого любой мгновенный всплеск CPU на долю секунды считался бы инцидентом.
+- 4-е правило `ServiceDown` (`up == 0`) я добавил сверх вашего исходного списка — это стандартный и очень полезный алерт: `up` — служебная метрика, которую сам Prometheus создаёт для каждой цели, `0` означает, что цель не отвечает на scrape (сервис упал/недоступен). Если не нужен — просто удалите этот блок.
+
+Не забудьте перед деплоем поправить в `alertmanager.yml`: email/пароль приложения Gmail и `bot_token`/`chat_id` для Telegram — сейчас там заглушки.
+
+
+=========Dashboard Grafana============
+
+## Шаг 0 — создать дашборд и подключить источники данных
+
+1. Откройте Grafana → **Connections → Data sources** → убедитесь, что видите `Prometheus` и `Loki` (если разворачивали через provisioning из прошлых шагов — они уже там; если нет — добавьте вручную: **Add data source → Prometheus**, URL `http://prometheus:9090` → **Save & test**; аналогично для Loki, URL `http://loki:3100`).
+2. **Dashboards → New → New Dashboard**.
+3. **Add visualization** — на пустом дашборде появится кнопка добавления первой панели.
+
+Дальше — для **каждой** панели одна и та же последовательность действий: `Add → Visualization → выбрать datasource → вставить запрос в поле "Metric"/"Query" → выбрать тип панели справа (Stat/Time series/Logs) → Apply`. Ниже — что вписывать в каждую панель конкретно.
+
+---
+
+## Панели на Prometheus (метрики) — тип панели "Stat"
+
+Для 1–3, 8, 10–14: выбираете справа тип панели **Stat** (показывает одно большое число) — подходит, когда нужно просто "количество чего-то".
+
+| № | Название панели | Query (вставить в поле запроса) |
+|---|---|---|
+| 1 | Количество нод | `count(node_uname_info)` |
+| 2 | Количество контейнеров | `count(container_last_seen)` |
+| 3 | Количество стеков | `count(count by (container_label_com_docker_stack_namespace) (container_last_seen))` |
+| 8 | Количество CPU | `count(node_cpu_seconds_total{mode="idle"})` |
+| 10 | Отправлено сообщений RabbitMQ | `rabbitmq_messages_sent_total` |
+| 11 | Обработано сообщений RabbitMQ | `rabbitmq_messages_processed_total` |
+| 12 | Количество бронирований | `bookings_created_total` |
+| 13 | Запросов на gateway | `gateway_requests_total` |
+| 14 | Запросов на авторизацию | `auth_requests_total` |
+
+Для каждой: `Add → Visualization → Prometheus`, вставляете запрос, справа в панели **Visualization** выбираете **Stat**, называете панель в поле **Panel options → Title**, жмёте **Apply**.
+
+---
+
+## Панели на Prometheus — тип панели "Time series"
+
+Для 4, 5, 6, 7 — берите тип **Time series** (график изменения во времени), т.к. это метрики, где важна динамика, а не одно число.
+
+**4. Использование CPU по сервисам**
+```
+sum(rate(container_cpu_usage_seconds_total{name!=""}[5m])) by (name)
+```
+Тип: **Time series**. В поле **Legend** (внизу редактора запроса) впишите `{{name}}` — чтобы на графике каждая линия подписывалась именем сервиса, а не сплошным номером.
+
+**5. Использование CPU по ядрам и узлам**
+```
+sum(rate(node_cpu_seconds_total{mode!="idle"}[5m])) by (instance, cpu)
+```
+Legend: `{{instance}} cpu{{cpu}}`
+
+**6. Затраченная RAM**
+```
+node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes
+```
+Справа в **Field → Unit** выберите **Data → bytes(IEC)** — тогда график покажет "1.2 GiB" вместо "1288490188".
+
+**7. Доступная и занятая память** — тут **два запроса в одной панели**:
+- Нажмите **+ Query** (добавить второй запрос) в редакторе панели:
+  - Query A: `node_memory_MemAvailable_bytes`, Legend: `Доступно`
+  - Query B: `node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes`, Legend: `Занято`
+- Тип: **Time series**, Unit: **bytes(IEC)** (как в п.6).
+
+---
+
+## Панель 9 — Доступность google.com (Stat)
+
+```
+probe_success{instance="https://google.com"}
+```
+Тип: **Stat**. Чтобы вместо `1`/`0` показывало текст "UP"/"DOWN":
+- В редакторе панели справа откройте **Value mappings → Add value mappings**
+- Добавьте: значение `1` → текст `UP`, цвет зелёный
+- Добавьте: значение `0` → текст `DOWN`, цвет красный
+
+> ⚠️ Обратите внимание: если ваш `blackbox_exporter` в `prometheus.yml` настроен не на `google.com`, а на ваши внутренние эндпоинты (как мы делали ранее — `gateway-service`, `session-service` и т.д.) — тогда фильтр `{instance="https://google.com"}` вернёт пусто. Проверьте реальное значение label `instance` через **Explore** (см. ниже) и подставьте правильный адрес, либо уберите фильтр совсем — `probe_success` без `{}` покажет все проверяемые эндпоинты сразу.
+
+---
+
+## Панель 15 — Логи приложения (Loki)
+
+- `Add → Visualization` → в выборе источника данных **обязательно переключите на Loki** (по умолчанию будет выбран последний использованный, т.е. Prometheus).
+- Query (LogQL):
+```
+{service=~".+"}
+```
+или конкретный сервис:
+```
+{service="booking-service"}
+```
+- Тип панели справа: **Logs** (появится в списке только когда выбран Loki-источник).
+- В **Panel options** можно включить **Wrap lines** — чтобы длинные строки логов не обрезались.
+
+---
+
+## Как проверить запрос перед тем, как класть его в панель
+
+Полезная привычка — не гадать сразу в редакторе панели, а сначала проверить запрос в **Explore** (иконка компаса в левом меню): выбираете источник (Prometheus или Loki), вставляете запрос, жмёте **Run query** — сразу видно, есть ли данные и как выглядят метки (`instance`, `name`, `service` и т.д.), прежде чем оформлять как панель.
+
+## Сохранение дашборда
+
+После добавления всех 15 панелей: кнопка **Save dashboard** (дискета вверху) → название `Infrastructure & App Monitoring` → **Save**. Расположить панели по сетке можно перетаскиванием за правый нижний угол каждой панели (изменение размера) и заголовок (перемещение).
+

@@ -1,0 +1,179 @@
+version: "3.8"
+
+services:
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+      - source: prometheus_alert_rules
+        target: /etc/prometheus/alert_rules.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    volumes:
+      - prometheus_data:/prometheus
+    ports:
+      - target: 9090
+        published: 9090
+        mode: host
+    networks:
+      - monitoring
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  # Loki (хранит логи)
+  loki:
+    image: grafana/loki:3.7.4
+    configs:
+      - source: loki_config
+        target: /etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki
+    ports:
+      - "3100:3100"
+    networks:
+      - monitoring
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+# Promtail 
+  promtail:
+    image: grafana/promtail:3.6.11
+    configs:
+      - source: promtail_config
+        target: /etc/promtail/promtail-config.yml
+    command: -config.file=/etc/promtail/promtail-config.yml
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    networks:
+      - monitoring
+    deploy:
+      mode: global
+
+  # node_exporter
+  node-exporter:
+    image: prom/node-exporter:latest
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      - monitoring
+    deploy:
+      mode: global   # <-- ключевое: контейнер запускается на КАЖДОЙ ноде кластера
+
+  #  blackbox_exporter (проверка доступности HTTP-эндпоинтов)
+  blackbox-exporter:
+    image: prom/blackbox-exporter:latest
+    configs:
+      - source: blackbox_config
+        target: /etc/blackbox_exporter/config.yml
+    command:
+      - '--config.file=/etc/blackbox_exporter/config.yml'
+    networks:
+      - monitoring
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  # cAdvisor (метрики контейнеров, по одному на каждую ноду) 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    command:
+      - --docker_only=true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    networks:
+      - monitoring
+    deploy:
+      mode: global   # <-- по одному на каждую ноду
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_USER: htclelik@gmail.com
+      GF_SECURITY_ADMIN_PASSWORD: admin        # ← смените после первого входа
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    configs:
+      - source: grafana_datasources
+        target: /etc/grafana/provisioning/datasources/datasources.yml
+      - source: grafana_dashboards_provider
+        target: /etc/grafana/provisioning/dashboards/dashboards.yml
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/dashboards/json:/etc/grafana/provisioning/dashboards/json:ro
+    ports:
+      - "53030:3000"
+    networks:
+      - monitoring
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  # Alert Manager
+  alertmanager:
+    image: prom/alertmanager:latest
+    configs:
+      - source: alertmanager_config
+        target: /etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    volumes:
+      - alertmanager_data:/alertmanager
+    ports:
+      - "9093:9093"
+    networks:
+      - monitoring
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+volumes:
+  prometheus_data:
+  loki_data:
+  grafana_data:
+  alertmanager_data:
+
+networks:
+  # ВАЖНО: это та же сеть, что и s21_app-network в стеке приложения (см. ниже),
+  # чтобы Prometheus мог достучаться до /actuator/prometheus сервисов приложения,
+  # а сервисы приложения — до loki:3100 для отправки логов.
+  monitoring:
+    external: true
+    name: s21_app-network
+
+configs:
+  prometheus_config:
+    file: ./prometheus/prometheus.yml
+  loki_config:
+    file: ./loki/loki-config.yml
+  promtail_config:
+    file: ./promtail/promtail-config.yml
+  blackbox_config:
+    file: ./blackbox/blackbox.yml
+  grafana_datasources:
+    file: ./grafana/provisioning/datasources/datasources.yml
+  grafana_dashboards_provider:
+    file: ./grafana/provisioning/dashboards/dashboards.yml
+  alertmanager_config:
+    file: ./alertmanager/alertmanager.yml
+  prometheus_alert_rules:
+    file: ./prometheus/alert_rules.yml

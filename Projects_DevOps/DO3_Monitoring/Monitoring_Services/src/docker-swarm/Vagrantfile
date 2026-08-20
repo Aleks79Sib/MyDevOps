@@ -1,0 +1,99 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+# Vagrantfile — универсальный (Linux → libvirt, Mac/Win → VirtualBox)
+# Автоопределение ОС хоста 
+def os_windows?
+  RUBY_PLATFORM =~ /mingw|mswin/
+end
+
+def os_mac?
+  RUBY_PLATFORM =~ /darwin/
+end
+
+def os_linux?
+  RUBY_PLATFORM =~ /linux/
+end
+
+def arm_mac?
+  RUBY_PLATFORM =~ /arm64-darwin|aarch64-darwin/
+end
+
+# Выбираем провайдера в зависимости от ОС
+provider = if os_linux?
+             :libvirt
+           else
+             :virtualbox
+           end
+
+
+# Запуск строго последовательно                                                                 
+ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+
+# Общие настройки ВМ 
+Vagrant.configure("2") do |config|
+  config.vm.box = if arm_mac? then "bento/ubuntu-22.04" else "generic/ubuntu2204" end
+#   config.vm.box_version = "0"
+
+  # Настройки в зависимости от провайдера
+  if provider == :libvirt
+    config.vm.synced_folder "./shared", "/home/vagrant/src", type: "rsync", create: true
+    config.vm.provider "libvirt" do |libvirt|
+      libvirt.memory = "1024"
+      libvirt.cpus = 1
+      libvirt.driver = "kvm"
+    end
+  else
+    config.vm.synced_folder "./shared", "/home/vagrant/src", create: true
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+  end
+ 
+  nodes = [
+    {
+      name: "master-do9",
+      ip:   "192.168.121.150",
+      ports: []
+    },
+    {
+      name: "worker-do9-1",
+      ip:   "192.168.121.151",
+      ports: []
+    },
+    {
+      name: "worker-do9-2",
+      ip:   "192.168.121.152",
+      ports: []
+    }
+
+  ]
+
+  # Создаём все машины в цикле
+  nodes.each do |node|
+    config.vm.define node[:name] do |vm|
+      vm.vm.hostname = node[:name]
+      vm.vm.network "private_network", ip: node[:ip]
+
+      # Пробрасываем порты, если они заданы
+      node[:ports].each do |port|
+        vm.vm.network "forwarded_port",
+          guest: port[:guest],
+          host: port[:host],
+          protocol: "tcp"
+      end
+
+      if node[:name] == "master-do9"
+      #vm.vm.synced_folder "../consul01", "/home/vagrant/src/consul01", type: "rsync"
+      vm.vm.provision "shell", path: "scripts/install_docker.sh"
+      vm.vm.provision "shell", path: "scripts/init_swarm.sh"
+
+      elsif ["worker-do9-1", "worker-do9-2"].include?(node[:name])
+      vm.vm.provision "shell", path: "scripts/install_docker.sh"
+      vm.vm.provision "shell", path: "scripts/join_swarm.sh"
+      end
+    end
+  end
+end

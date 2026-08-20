@@ -1,0 +1,173 @@
+# version: "3.8"                                                                                  
+                                                                                                
+services:                                                                                       
+  postgres_s21:                                                                                     
+    image: postgres:16-alpine                                                                   
+    restart: unless-stopped                                                                     
+    environment:                                                                                
+      POSTGRES_USER: ${POSTGRES_USER}                                                           
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}                                                   
+    volumes:                                                                                                          
+      - postgres_data:/var/lib/postgresql/data
+    configs:                                                                                    
+      - source: init_sql                                                                        
+        target: /docker-entrypoint-initdb.d/init.sql                                                  
+    healthcheck:                                                                                
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]                                     
+    networks:                                                                                   
+      - app-network                                                                             
+                                                                                                
+  rabbitmq:                                                                                     
+    image: rabbitmq:3-management-alpine                                                         
+    restart: unless-stopped                                                                     
+    environment:                                                                                
+      RABBITMQ_DEFAULT_USER: ${RABBIT_MQ_USER}                                                  
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_MQ_PASSWORD}                                              
+    networks:                                                                                   
+      - app-network                                                                             
+                                                                                                
+  session-service:                                                                              
+    image: htclelik/session-service:v2.do9-1-metrics                                                     
+    restart: unless-stopped                                                                     
+    ports:                                                                                      
+      # - "${SESSION_SERVICE_PORT}:8081"
+      - 30001:8081                                                         
+    environment:                                                                                
+      POSTGRES_HOST: postgres_s21                                                                   
+      POSTGRES_PORT: ${POSTGRES_PORT}                                                           
+      POSTGRES_USER: ${POSTGRES_USER}                                                           
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}                                                   
+      POSTGRES_DB: users_db                                                                     
+    depends_on:                                                                                 
+      - postgres_s21                                                              
+    networks:                                                                                   
+      - app-network                                                                             
+                                                                                                
+  hotel-service:                                                                                
+    image: htclelik/hotel-service:v2.do9-1-metrics                                                       
+    restart: unless-stopped                                                                     
+    environment:                                                                                
+      POSTGRES_HOST: postgres_s21                                                                   
+      POSTGRES_PORT: ${POSTGRES_PORT}                                                           
+      POSTGRES_USER: ${POSTGRES_USER}                                                           
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}                                                   
+      POSTGRES_DB: hotels_db                                                                    
+    depends_on:                                                                                 
+      - postgres_s21                                                              
+    networks:                                                                                   
+      - app-network                                                                             
+                                                                                                
+  payment-service:                                                                              
+    image: htclelik/payment-service:v2.do9-1-metrics                                                     
+    restart: unless-stopped                                                                     
+    environment:                                                                                
+      POSTGRES_HOST: postgres_s21                                                                   
+      POSTGRES_PORT: ${POSTGRES_PORT}                                                           
+      POSTGRES_USER: ${POSTGRES_USER}                                                           
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}                                                   
+      POSTGRES_DB: payments_db                                                                  
+    depends_on:                                                                                 
+      - postgres_s21                                                              
+    networks:                                                                                   
+      - app-network                                                                             
+                                                                                                
+  loyalty-service:                                                                              
+    image: htclelik/loyalty-service:v2.do9-1-metrics                                                     
+    restart: unless-stopped                                                                     
+    environment:                                                                                
+      POSTGRES_HOST: postgres_s21                                                                   
+      POSTGRES_PORT: ${POSTGRES_PORT}                                                           
+      POSTGRES_USER: ${POSTGRES_USER}                                                           
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}                                                   
+      POSTGRES_DB: balances_db                                                                  
+    depends_on:                                                                                 
+      - postgres_s21                                                             
+    networks:                                                                                   
+      - app-network                                                                             
+                                                                                                
+  report-service:                                                                               
+    image: htclelik/report-service:v2.do9-1-metrics                                                      
+    restart: unless-stopped                                                                     
+    environment:                                                                                
+      POSTGRES_HOST: postgres_s21                                                                   
+      POSTGRES_PORT: ${POSTGRES_PORT}                                                           
+      POSTGRES_USER: ${POSTGRES_USER}                                                           
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}                                                   
+      POSTGRES_DB: statistics_db                                                                
+      RABBIT_MQ_HOST: rabbitmq                                                                  
+      RABBIT_MQ_PORT: ${RABBIT_MQ_PORT}                                                         
+      RABBIT_MQ_USER: ${RABBIT_MQ_USER}                                                         
+      RABBIT_MQ_PASSWORD: ${RABBIT_MQ_PASSWORD}                                                 
+      RABBIT_MQ_QUEUE_NAME: ${RABBIT_MQ_QUEUE_NAME}                                             
+      RABBIT_MQ_EXCHANGE: ${RABBIT_MQ_EXCHANGE}                                                 
+    depends_on:                                                                                 
+      - postgres_s21                                                              
+    networks:                                                                                   
+      - app-network                                                                             
+                                                                                                
+  booking-service:                                                                              
+    image: htclelik/booking-service:v2.do9-1-metrics                                                     
+    restart: unless-stopped                                                                     
+    environment:                                                                                
+      POSTGRES_HOST: postgres_s21                                                                   
+      POSTGRES_PORT: ${POSTGRES_PORT}                                                           
+      POSTGRES_USER: ${POSTGRES_USER}                                                           
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}                                                   
+      POSTGRES_DB: reservations_db                                                              
+      RABBIT_MQ_HOST: rabbitmq                                                                  
+      RABBIT_MQ_PORT: ${RABBIT_MQ_PORT}                                                         
+      RABBIT_MQ_USER: ${RABBIT_MQ_USER}                                                         
+      RABBIT_MQ_PASSWORD: ${RABBIT_MQ_PASSWORD}                                                 
+      RABBIT_MQ_QUEUE_NAME: ${RABBIT_MQ_QUEUE_NAME}                                             
+      RABBIT_MQ_EXCHANGE: ${RABBIT_MQ_EXCHANGE}                                                 
+      HOTEL_SERVICE_HOST: hotel-service                                                         
+      HOTEL_SERVICE_PORT: ${HOTEL_SERVICE_PORT}                                                 
+      PAYMENT_SERVICE_HOST: payment-service                                                     
+      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}                                             
+      LOYALTY_SERVICE_HOST: loyalty-service                                                     
+      LOYALTY_SERVICE_PORT: ${LOYALTY_SERVICE_PORT}                                             
+    depends_on:                                                                                 
+      - postgres_s21                                                             
+    networks:                                                                                   
+      - app-network                                                                             
+                                                                                                
+  gateway-service:                                                                              
+    image: htclelik/gateway-service:v2.do9-1-metrics                                                     
+    restart: unless-stopped                                                                     
+    ports:                                                                                      
+      # - "${GATEWAY_SERVICE_PORT}:8087"                                                                                      
+      - "30007:8087"                                                         
+    environment:                                                                                
+      SESSION_SERVICE_HOST: session-service                                                     
+      SESSION_SERVICE_PORT: ${SESSION_SERVICE_PORT}                                             
+      HOTEL_SERVICE_HOST: hotel-service                                                         
+      HOTEL_SERVICE_PORT: ${HOTEL_SERVICE_PORT}                                                 
+      BOOKING_SERVICE_HOST: booking-service                                                     
+      BOOKING_SERVICE_PORT: ${BOOKING_SERVICE_PORT}                                             
+      PAYMENT_SERVICE_HOST: payment-service                                                     
+      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}                                             
+      LOYALTY_SERVICE_HOST: loyalty-service                                                     
+      LOYALTY_SERVICE_PORT: ${LOYALTY_SERVICE_PORT}                                             
+      REPORT_SERVICE_HOST: report-service                                                       
+      REPORT_SERVICE_PORT: ${REPORT_SERVICE_PORT}                                               
+    depends_on:                                                                                 
+      - session-service                                                                         
+      - hotel-service                                                                           
+      - booking-service                                                                         
+      - payment-service                                                                         
+      - loyalty-service                                                                         
+      - report-service                                                                          
+    networks:                                                                                   
+      - app-network                                                                             
+                                                                                                
+volumes:                                                                                        
+  postgres_data:                                                                                
+                                                                                                
+networks:                                                                                       
+  app-network:                                                                                  
+    driver: overlay                                                                             
+    attachable: true
+
+configs:                                                                                        
+  init_sql:                                                                                     
+    file: ./init.sql
