@@ -2,13 +2,15 @@
 
 Мой опыт Devops начался с "боли" развернуть собственного телеграмма бота, написанного на языке Python
 
-Я поступил в Школу 21 по направлению Devops
+Я прошел разные курсы по направлению Devops
 
 Чему научился и что протестировал:
 
-- [Проекты Школы 21](./Projects_School21)
-
 - [Проект Домашний сервер](./HomeServer)
+
+- [Проекты DevOps](./Projects_DevOps/)
+
+
 
 где развернул собственный домашний сервер и на нем тестировал различные программы open-source решения 
 
@@ -18,11 +20,11 @@
 
 ## Проекты по направлению Devops
 
-### 1. [Basic Linux](./Projects_School21/DO1_Basic_Linux/BASIC_LINUX_RUS.MD)
+### 1. [Basic Linux](./Projects_DevOps/DO1_Basic_Linux/BASIC_LINUX_RUS.MD)
 
-### 2. [Linux Networking](./Projects_School21/DO2_LinuxNetwork/LINUX_NETWORKING.md)
+### 2. [Linux Networking](./Projects_DevOps/DO2_LinuxNetwork/LINUX_NETWORKING.md)
 
-### 3. [Bash Scripts](./Projects_School21/DO3_Monitoring/Bash_scripts_Linux/BASH_SCRIPTS.MD)
+### 3. [Bash Scripts](./Projects_DevOps/DO3_Monitoring/Bash_scripts_Linux/BASH_SCRIPTS.MD)
 
 
 ## Мой первый собственный HomeServer
