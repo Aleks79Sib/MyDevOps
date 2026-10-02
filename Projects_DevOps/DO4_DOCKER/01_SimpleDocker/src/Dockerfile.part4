@@ -1,0 +1,25 @@
+# 1. Базовый образ на основе nginx
+FROM nginx:latest
+
+# 2. Рабочая директория внутри контейнера
+WORKDIR /app
+
+# 3. Копируем исходник из part_3 и конфиг nginx.
+# Пути указаны ОТНОСИТЕЛЬНО папки src, из которой запускаем docker build!
+COPY server/hello.c /app/hello.c
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+
+# 4. Обновляем пакеты, ставим нужное, компилируем hello.c и сразу чистим мусор
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        libfcgi-dev \
+        spawn-fcgi && \
+    # Компиляция исходника в исполняемый файл hello_fcgi
+    gcc -o hello_fcgi hello.c -lfcgi && \
+    # Очистка кэша для уменьшения размера образа
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 5. Запускаем два процесса: spawn-fcgi + nginx
+CMD ["sh", "-c", "spawn-fcgi -p 8080 /app/hello_fcgi & nginx -g 'daemon off;'"]
