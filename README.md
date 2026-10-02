@@ -32,6 +32,9 @@
   - [Simple Docker](./Projects_DevOps/DO4_DOCKER/01_SimpleDocker/src/REPORT.md)
   - [Basic_CI_CD](./Projects_DevOps/DO4_DOCKER/02_Basic_CI_CD_Gitlab/src/REPORT.md)
 
+### 5. [Kubernetec](./Projects_DevOps/DO5_KUBERNETEC/)
+
+  - [AdvK8s_CICD](./Projects_DevOps/DO5_KUBERNETEC/04_Advs_CICD/src/REPORT.MD)
 
 ## Мой первый собственный HomeServer
 
