@@ -2,36 +2,40 @@
 
 ## 1. Готовый докер
 
-- 1. Скачивание официального образа nginx
+- Скачивание официального образа nginx
 ```
 docker pull nginx
 ```
 
-- 2. Проверка наличия образа
+- Проверка наличия образа
 ```
 docker images nginx
 ```
 
-- 3. Создание и запуск контейнера
+- Создание и запуск контейнера
 ```
 docker run -d nginx d607865cd608
 ```
 
 
-- 4. Проверка, что контейнер запущен
+-  Проверка, что контейнер запущен
 ```
 docker ps
 ```
 ![docker ps](./part_1/images/image_1.png)
 
-- 5. Информация о контейнере (docker inspect)
+-  Информация о контейнере (docker inspect)
 ```
 docker inspect 5706cae7e821
 docker inspect --size 5706cae7e821 | grep -E '"SizeRootFs"|"SizeRw"'
 ```
 - **Размер контейнера (SizeRootFs):** 180,953,022 байт (~185 MB)
+
 - **Слой записи (SizeRw):** 1095 байт
-- **Замапленные порты:** 80/tcp (на момент первого запуска без `-p` порты не замаплены)
+
+- **Замапленные порты:** 80/tcp (на момент первого 
+запуска без `-p` порты не замаплены)
+
 - **IP контейнера:** 172.17.0.2
 
 ![docker inspect](./part_1/images/docker_inspect_size_ip.png)
@@ -44,34 +48,36 @@ docker inspect --size 5706cae7e821 | grep -E '"SizeRootFs"|"SizeRw"'
 
 ![docker inspect](./part_1/images/docker_inspect_4.png)
 
-- 6. Остановка контейнера
+- Остановка контейнера
 ```
 docker stop 5706cae7e821
 ```
 
-- 7. Проверка, что контейнер остановлен
+-  Проверка, что контейнер остановлен
 ```
 docker ps
 ```
+
 ![docker ps after stop](./part_1/images/docker_stop.png)
 
-- 8. Запуск контейнера с пробросом портов 80 и 443
+- Запуск контейнера с пробросом портов 80 и 443
 ```
 docker run -d -p 80:80 -p 443:443 nginx
 ```
 ![docker run with ports](./part_1/images/docker_run_ports_80_443.png)
 
-- 9. Проверка доступности nginx по адресу localhost:80
+- Проверка доступности nginx по адресу localhost:80
 ```
 curl -s http://127.0.0.1:80
 ```
 ![nginx welcome page](./part_1/images/screen_localhost.png)
 
+
 Стартовая страница **nginx** доступна по адресу `127.0.0.1:80` (заголовок: "Welcome to nginx!").
 
 ![nginx welcome page](./part_1/images/docker_browser_nginx.png)
 
-- 10. Перезапуск контейнера
+- Перезапуск контейнера
 ```
 docker restart
 # Заново запускал контейнер  поэтому id контейнера изменился на 649430a9d8b3
@@ -83,7 +89,7 @@ docker ps
 
 ## 2. Операции с контейнером
 
-- 1. Прочитал конфигурационный файл nginx.conf внутри докер контейнера через команду exec.
+- Прочитал конфигурационный файл nginx.conf внутри докер контейнера через команду exec.
 
 ```
 docker exec 649430a9d8b3 cat /etc/nginx/nginx.conf
@@ -123,7 +129,7 @@ http {
 ```
 ![docker exec cat nginx.conf](./part_2/images/docker_exec_cat_nginx_conf.png)
 
-- 2. Создал на локальной машине файл nginx.conf.
+- Создал на локальной машине файл nginx.conf.
 
 Создан файл `nginx.conf` с содержимым:
 ```
@@ -140,23 +146,23 @@ server {
 ```
 ![nginx.conf](./part_2/images/vim_nginx_conf.png)
 
-- 3. Настроил в нем по пути /status отдачу страницы статуса сервера nginx.
+- Настроил в нем по пути /status отдачу страницы статуса сервера nginx.
 
 Файл настроен. Server-блок со `stub_status` добавлен в `/etc/nginx/nginx.conf` внутрь директивы `http {}`.
 
-- 4. Скопировал созданный файл nginx.conf внутрь докер-контейнера через команду docker cp.
+- Скопировал созданный файл nginx.conf внутрь докер-контейнера через команду docker cp.
 
 ```
 docker cp nginx.conf 2ec4f4984f5e:/etc/nginx/nginx.conf
 ```
 
-- 5. Перезапустил nginx внутри докер-контейнера через команду exec.
+- Перезапустил nginx внутри докер-контейнера через команду exec.
 
 ```
 docker exec 2ec4f4984f5e nginx -s reload
 ```
 
-- 6. Проверил, что по адресу localhost:80/status отдается страничка со статусом сервера nginx.
+- Проверил, что по адресу localhost:80/status отдается страничка со статусом сервера nginx.
 
 ```
 curl http://127.0.0.1:80/status
@@ -172,33 +178,33 @@ Reading: 0 Writing: 1 Waiting: 0
 ![curl /status](./part_2/images/localhost_status.png)
 
 
-- 7. Экспортировал контейнер в файл container.tar через команду export.
+- Экспортировал контейнер в файл container.tar через команду export.
 
 ```
 docker export 2ec4f4984f5e -o container.tar
 ```
 ![docker export](./part_2/images/container_tar.png)
 
-- 8. Остановил контейнер.
+- Остановил контейнер.
 
 ```
 docker stop 2ec4f4984f5e
 ```
 
-- 9. Удалил образ через docker rmi [image_id|repository], не удаляя перед этим контейнеры.
+- Удалил образ через docker rmi [image_id|repository], не удаляя перед этим контейнеры.
 
 ```
 docker rmi -f nginx
 ```
 
-- 10. Удалил остановленный контейнер.
+- Удалил остановленный контейнер.
 
 ```
 docker rm 2ec4f4984f5e
 ```
 ![Удаление и Остановка контейнера](./part_2/images/rmi_rm_docker.png)
 
-- 11. Создал образ из файла container.tar через команду import.
+- Создал образ из файла container.tar через команду import.
 
 ```
 docker import container.tar nginx:latest
@@ -206,7 +212,7 @@ docker import container.tar nginx:latest
 
 ![docker import](./part_2/images/import_container.png)
 
-- 12. Создал и запустил контейнер на основе импортированного образа.
+- Создал и запустил контейнер на основе импортированного образа.
 
 ```
 docker run -d -p 80:80 -p 443:443 nginx-new nginx -g "daemon off;"
@@ -214,7 +220,7 @@ docker ps
 ```
 ![docker run](./part_2/images/docker_run_nginx_new.png)
 
-- 13. Проверил, что по адресу localhost:80/status отдается страничка со статусом сервера nginx.
+- Проверил, что по адресу localhost:80/status отдается страничка со статусом сервера nginx.
 
 ```
 curl http://127.0.0.1:80/status
@@ -223,9 +229,9 @@ curl http://127.0.0.1:80/status
 
 ![status after import](./part_2/images/new_status_nginx.png)
 
-## Part 3. Мини веб-сервер
+## 3. Мини веб-сервер
 
-- 1. Написал мини-сервер на C и FastCgi, возвращающий "Hello, World!"
+- Написал мини-сервер на C и FastCgi, возвращающий "Hello, World!"
 
 Файл `src/server/hello.c`:
 ```c
@@ -253,7 +259,7 @@ cd server
 gcc -o hello hello.c -I/opt/homebrew/include -L/opt/homebrew/lib -lfcgi
 ```
 
-- 2. Запустил мини-сервер через spawn-fcgi на порту 8080
+- Запустил мини-сервер через spawn-fcgi на порту 8080
 
 ```
 spawn-fcgi -p 8080 ./hello
@@ -262,7 +268,7 @@ ps aux | grep hello | grep -v grep && lsof -i :8080 | grep LISTEN
 ```
 ![spawn-fcgi](./part_3/images/spawn-fcgi.png)
 
-- 3. Написал nginx.conf, проксирующий запросы с 81 порта на 127.0.0.1:8080
+- Написал nginx.conf, проксирующий запросы с 81 порта на 127.0.0.1:8080
 
 Файл [nginx.conf](./server/nginx.conf):
 ```nginx
@@ -285,7 +291,7 @@ http {
 
 
 
-- 4. Запустил nginx в Docker с написанной конфигурацией
+- Запустил nginx в Docker с написанной конфигурацией
 
 ```
 docker run -d -p 81:81 --name nginx-part3 nginx
@@ -297,11 +303,11 @@ curl http://127.0.0.1:81
 ```
 ![nginx](./part_3/images/restart_Nginx.png)
 
-- 5. Проверил, что по localhost:81 отдается страничка "Hello, World!"
+- Проверил, что по localhost:81 отдается страничка "Hello, World!"
 
 ![localhost:81](./part_3/images/loccalhost_81.png)
 
-- 6. Положил nginx.conf по пути ./nginx/nginx.conf
+- Положил nginx.conf по пути ./nginx/nginx.conf
 
 ```
 cd src
@@ -312,11 +318,11 @@ cp sever/nginx.conf nginx/nginx.conf
 
 ## 4. Свой докер
 
-- 1. Создал докерфайл  Dockerfile.part4
+- Создал докерфайл  Dockerfile.part4
 
 [Dockerfile.part4](Dockerfile.part4)
 
-- 2. Создал докер-образ через docker build при этом указав имя hello-fcgi и тег part_4
+- Создал докер-образ через docker build при этом указав имя hello-fcgi и тег part_4
 ```
 # Перейти в src
 cd src
@@ -326,7 +332,7 @@ docker build -f Dockerfile.part4 -t hello-fcgi:part_4 .
 ```
 ![docker build](./part_4/images/dockerfile_build.png)
 
-- 3 Проверили через docker images hello-fcgi:part_4
+- Проверили через docker images hello-fcgi:part_4
 
 ```
 docker images hello-fcgi:part_4
@@ -334,7 +340,7 @@ docker images hello-fcgi:part_4
 
 ![docker images](./part_4/images/docker_images.png)
 
-- 4 Запустили контейнер докер-образ с маппингом 81 порта на 80 на локальной машине и маппингом папки ./nginx внутрь контейнера
+- Запустили контейнер докер-образ с маппингом 81 порта на 80 на локальной машине и маппингом папки ./nginx внутрь контейнера
 
 ```
 docker run -d -p 80:81 -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf hello-fcgi:part_4
@@ -342,13 +348,13 @@ docker run -d -p 80:81 -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf hello-fc
 
 ![docker run](./part_4/images/docker_run.png)
 
-- 5 Проверили что сайт доступен по адресу http://localhost:80
+- Проверили что сайт доступен по адресу http://localhost:80
 
 ![localhost](./part_4/images/localhost.png)]
 
 ![browser](./part_4/images/browser.png)]
 
-- 6 Допишим в ./nginx/nginx.conf проксирование странички /status, по которой надо отдавать статус сервера nginx.
+- Допишим в ./nginx/nginx.conf проксирование странички /status, по которой надо отдавать статус сервера nginx.
 
 ```
 location /status {                                                                                           
@@ -360,7 +366,7 @@ location /status {
 
 [nginx.conf](./nginx/nginx.conf)
 
-- 7 Перезапустим docker
+- Перезапустим docker
 
 ```
 docker restart 7b39e650378f
@@ -368,7 +374,7 @@ docker restart 7b39e650378f
 
 ![docker restart](./part_4/images/docker_restart.png)
 
-- 8 Проверим, что теперь по localhost:80/status отдается страничка со статусом nginx
+- Проверим, что теперь по localhost:80/status отдается страничка со статусом nginx
 
 ![localhost:80/status](./part_4/images/localhost_status.png)
 
@@ -377,9 +383,9 @@ docker restart 7b39e650378f
 
 ## 5. Dockle
 
-- 1 Установим Dockle
+- Установим Dockle
 
-- 2 запустим dockle и проверим образ
+- запустим dockle и проверим образ
 
 ```
 dockle hello-fcgi:part_4
@@ -387,7 +393,7 @@ dockle hello-fcgi:part_4
 
 ![dockle](./part_5/images/dockle_scan.png)
 
-- 3 Выявили следующие ошибки и предупреждения:
+- Выявили следующие ошибки и предупреждения:
 
 ```
 FATAL	- CIS-DI-0010: Не храните учетные данные в переменных/файлах среды.
@@ -400,7 +406,7 @@ INFO	- CIS-DI-0006: Добавьте инструкцию HEALTHCHECK в обр�
 INFO	- CIS-DI-0008: Подтвердите безопасность файлов setuid/setgid.
 ```
 
-- 4 Исправили ошибки в Dockerfile.part5
+- Исправили ошибки в Dockerfile.part5
 
 [Dockerfile.part5](Dockerfile.part5)
 
@@ -435,7 +441,7 @@ sudo docker run -d -p 80:81 -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf hel
 
 ## 6. Базовый Docker Compose
 
-- 1 Собрали docker-compose файл, который содержит:
+- Собрали docker-compose файл, который содержит:
   - докер-контейнер из Части 5 (он должен работать в локальной сети, т. е. не нужно использовать инструкцию EXPOSE и мапить порты на локальную машину).
 
   - докер-контейнер с nginx, который будет проксировать все запросы с 8080 порта на 81 порт первого контейнера.
@@ -451,7 +457,7 @@ sudo docker run -d -p 80:81 -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf hel
 docker stop $(docker ps -a -q)
 ```
 
-- 2 Запустили проект с помощью команд docker compose build и docker compose up.
+- Запустили проект с помощью команд docker compose build и docker compose up.
 
 ```
 docker ps
@@ -462,7 +468,7 @@ docker ps
 ![docker-compose-up](./part_6/images/docker_compose_build_up_d.png)
 
 
-- 3 Проверили, что в браузере по localhost:80 отдается написанная страничка, как и ранее
+- Проверили, что в браузере по localhost:80 отдается написанная страничка, как и ранее
 
 ![http://localhost:80](./part_6/images/browser_localhost.png)
 
