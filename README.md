@@ -26,6 +26,10 @@
 
 ### 3. [Bash Scripts](./Projects_DevOps/DO3_Monitoring/Bash_scripts_Linux/BASH_SCRIPTS.MD)
 
+### 4. [Docker](./Projects_DevOps/DO4_DOCKER/):
+  - [Simple Docker](./Projects_DevOps/DO4_DOCKER/01_SimpleDocker/src/REPORT.md)
+  - [Basic_CI_CD](./Projects_DevOps/DO4_DOCKER/02_Basic_CI_CD_Gitlab/src/REPORT.md)
+
 
 ## Мой первый собственный HomeServer
 
