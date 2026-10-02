@@ -1,0 +1,75 @@
+{{- if .Values.redis.enabled }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  labels:
+    {{- include "shopsphere.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.redis.persistence.size }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    {{- include "shopsphere.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  labels:
+    {{- include "shopsphere.labels" . | nindent 4 }}
+spec:
+  serviceName: redis
+  replicas: {{ .Values.redis.replicas }}
+
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis
+
+    spec:
+      containers:
+        - name: redis
+          image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+
+          resources:
+            {{- toYaml .Values.redis.resources | nindent 12 }}
+
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-pvc
+
+{{- end }}

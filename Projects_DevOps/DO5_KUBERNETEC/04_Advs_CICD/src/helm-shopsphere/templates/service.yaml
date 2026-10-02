@@ -1,0 +1,22 @@
+{{- range $serviceName, $service := .Values.services }}
+{{- if $service.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $serviceName }}
+  labels:
+    {{- include "shopsphere.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $serviceName }}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: {{ $serviceName }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+  ports:
+    - name: http
+      port: {{ $service.port }}
+      targetPort: http
+      protocol: TCP
+{{- end }}
+{{- end }}

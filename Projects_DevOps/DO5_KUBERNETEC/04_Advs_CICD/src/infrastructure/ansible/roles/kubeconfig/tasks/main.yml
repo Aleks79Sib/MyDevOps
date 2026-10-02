@@ -1,0 +1,21 @@
+- name: Get K3s kubeconfig
+  ansible.builtin.command:
+    cmd: cat /etc/rancher/k3s/k3s.yaml
+  register: k3s_kubeconfig
+  changed_when: false
+
+- name: Create .kube directory
+  ansible.builtin.file:
+    path: "{{ lookup('env', 'HOME') }}/.kube"
+    state: directory
+    mode: "0700"
+  delegate_to: localhost
+  become: false
+
+- name: Save kubeconfig locally
+  ansible.builtin.copy:
+    content: "{{ k3s_kubeconfig.stdout | replace('127.0.0.1', ansible_host) }}"
+    dest: "{{ lookup('env', 'HOME') }}/.kube/shop.yaml"
+    mode: "0600"
+  delegate_to: localhost
+  become: false

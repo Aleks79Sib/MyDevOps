@@ -1,0 +1,58 @@
+# gitlabUrl: "https://gitlab.com"
+concurrent: 1
+gitlabUrl: "https://git.21-school.ru"
+
+rbac:
+  create: true
+  clusterWideAccess: false
+
+  rules:
+    # Kubernetes executor управляет CI job Pods
+    - apiGroups: [""]
+      resources:
+        - pods
+        - pods/exec
+        - pods/attach
+        - pods/log
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - update
+        - delete
+        - patch
+
+    # Runner может работать с ConfigMaps,
+    # которые используются Kubernetes executor
+    - apiGroups: [""]
+      resources:
+        - configmaps
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - update
+        - delete
+        - patch
+
+    # Secret нужен Kubernetes executor для работы с job secrets
+    - apiGroups: [""]
+      resources:
+        - secrets
+      verbs:
+        - get
+        - list
+        - watch
+        - create
+        - update
+        - delete
+        - patch
+
+serviceAccount:
+  create: true
+
+runners:
+  secret: gitlab-runner-secret
+  executor: kubernetes

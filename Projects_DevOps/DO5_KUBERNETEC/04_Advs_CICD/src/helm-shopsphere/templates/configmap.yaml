@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "shopsphere.fullname" . }}-config
+  labels:
+    {{- include "shopsphere.labels" . | nindent 4 }}
+data:
+  SPRING_PROFILES_ACTIVE: {{ .Values.config.springProfile | quote }}
+
+  MONGODB_HOST: {{ .Values.config.mongodbHost | quote }}
+  REDIS_HOST: {{ .Values.config.redisHost | quote }}
+  ELASTICSEARCH_URI: {{ .Values.config.elasticsearchUri | quote }}
+
+  USER_SERVICE_URL: {{ .Values.config.userServiceUrl | quote }}
+  PRODUCT_SERVICE_URL: {{ .Values.config.productServiceUrl | quote }}
+  ORDER_SERVICE_URL: {{ .Values.config.orderServiceUrl | quote }}
+  CART_SERVICE_URL: {{ .Values.config.cartServiceUrl | quote }}
+  PAYMENT_SERVICE_URL: {{ .Values.config.paymentServiceUrl | quote }}
+  SHIPPING_SERVICE_URL: {{ .Values.config.shippingServiceUrl | quote }}
+  NOTIFICATION_SERVICE_URL: {{ .Values.config.notificationServiceUrl | quote }}
+  REVIEW_SERVICE_URL: {{ .Values.config.reviewServiceUrl | quote }}

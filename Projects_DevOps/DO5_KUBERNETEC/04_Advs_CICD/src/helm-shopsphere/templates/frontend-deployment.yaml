@@ -1,0 +1,39 @@
+{{- if .Values.frontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    {{- include "shopsphere.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      imagePullSecrets:
+        {{ toYaml $.Values.global.imagePullSecrets | nindent 8 }}
+      containers:
+        - name: frontend
+          image: {{ include "shopsphere.image" (dict "root" $ "service" .Values.frontend) }}
+          imagePullPolicy: {{ $.Values.global.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.frontend.port }}
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.frontend.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.frontend.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 20
+{{- end }}

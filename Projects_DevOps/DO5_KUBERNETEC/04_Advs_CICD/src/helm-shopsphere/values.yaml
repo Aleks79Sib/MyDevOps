@@ -1,0 +1,199 @@
+global:
+  image:
+    registry: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets:
+    - name: gitlab-com-registry
+
+
+services:
+  api-gateway:
+    enabled: true
+    image:
+      repository: api-gateway
+    replicas: 1
+    port: 8080
+
+  product-service:
+    enabled: true
+    image:
+      repository: product-service
+    replicas: 1
+    port: 8081
+
+  order-service:
+    enabled: true
+    image:
+      repository: order-service
+    replicas: 1
+    port: 8082
+
+  user-service:
+    enabled: true
+    image:
+      repository: user-service
+    replicas: 1
+    port: 8083
+
+  cart-service:
+    enabled: true
+    image:
+      repository: cart-service
+    replicas: 1
+    port: 8084
+
+  payment-service:
+    enabled: true
+    image:
+      repository: payment-service
+    replicas: 1
+    port: 8085
+
+  shipping-service:
+    enabled: true
+    image:
+      repository: shipping-service
+    replicas: 1
+    port: 8086
+
+  notification-service:
+    enabled: true
+    image:
+      repository: notification-service
+    replicas: 1
+    port: 8087
+
+  review-service:
+    enabled: true
+    image:
+      repository: review-service
+    replicas: 1
+    port: 8088
+
+frontend:
+  enabled: true
+  image:
+    repository: frontend
+  replicas: 1
+  port: 80
+
+
+config:
+  springProfile: prod
+
+  mongodbHost: mongodb
+  redisHost: redis
+  elasticsearchUri: http://elasticsearch:9200
+
+  userServiceUrl: http://user-service:8083
+  productServiceUrl: http://product-service:8081
+  orderServiceUrl: http://order-service:8082
+  cartServiceUrl: http://cart-service:8084
+  paymentServiceUrl: http://payment-service:8085
+  shippingServiceUrl: http://shipping-service:8086
+  notificationServiceUrl: http://notification-service:8087
+  reviewServiceUrl: http://review-service:8088
+
+
+secrets:
+  create: false
+  existingSecret: shopsphere-secrets
+
+
+mongodb:
+  enabled: true
+
+  image:
+    repository: mongo
+    tag: "8.0"
+
+  replicas: 1
+
+  persistence:
+    enabled: true
+    size: 5Gi
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+
+redis:
+  enabled: true
+
+  image:
+    repository: redis
+    tag: "7.4"
+
+  replicas: 1
+
+  persistence:
+    enabled: true
+    size: 2Gi
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+
+elasticsearch:
+  enabled: true
+
+  image:
+    repository: docker.elastic.co/elasticsearch/elasticsearch
+    tag: "8.12.1"
+
+  replicas: 1
+
+  persistence:
+    enabled: true
+    size: 10Gi
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+
+ingress:
+  enabled: true
+  className: traefik
+  host: shopsphere.local
+
+  tls:
+    enabled: false
+    secretName: shopsphere-tls
+
+
+hpa:
+  enabled: false
+
+
+resources:
+  default:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+tests:
+  newman:
+    enabled: true
+    image: postman/newman:alpine
+    baseUrl: "http://10.181.19.10"
+    host: "shopsphere.local"

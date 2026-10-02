@@ -1,0 +1,38 @@
+[[runners]]
+  name = "shopsphere-k8s-runner"
+  url = "https://git.21-school.ru"
+  executor = "kubernetes"
+
+  [runners.kubernetes]
+    namespace = "gitlab-runner"
+    service_account = "default"
+    image = "docker:24.0.5-cli"
+
+    cpu_request = "250m"
+    cpu_limit = "1"
+    memory_request = "512Mi"
+    memory_limit = "2Gi"
+
+    helper_cpu_request = "100m"
+    helper_cpu_limit = "250m"
+    helper_memory_request = "128Mi"
+    helper_memory_limit = "250Mi"
+
+    [runners.kubernetes.build_container_security_context]
+      run_as_user = 1000
+      run_as_group = 1000
+      run_as_non_root = true
+
+      [runners.kubernetes.build_container_security_context.seccomp_profile]
+        type = "Unconfined"
+
+      [runners.kubernetes.build_container_security_context.app_armor_profile]
+        type = "Unconfined"
+
+    [[runners.kubernetes.volumes.secret]]
+      name = "gitlab-com-registry"
+      mount_path = "/home/user/.docker"
+      read_only = true
+
+      [runners.kubernetes.volumes.secret.items]
+        ".dockerconfigjson" = "config.json"

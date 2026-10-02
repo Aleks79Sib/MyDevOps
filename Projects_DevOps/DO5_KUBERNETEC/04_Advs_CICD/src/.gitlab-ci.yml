@@ -1,0 +1,289 @@
+
+stages:
+  - build
+  - test
+  - staging
+  - cleanup
+  - production
+
+
+# BUILD =====
+build:
+  stage: build
+
+  image:
+    name: moby/buildkit:rootless
+    entrypoint: [""]
+
+  variables:
+    BUILDKITD_FLAGS: "--oci-worker-no-process-sandbox"
+    REGISTRY_HOST: "registry.gitlab.com"
+    REGISTRY_NAMESPACE: "devops-group5062834/devops-project"
+
+  script:
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        IMAGE_TAG="$CI_COMMIT_TAG"
+      else
+        IMAGE_TAG="$CI_COMMIT_SHORT_SHA"
+      fi
+
+      SERVICES="
+      api-gateway
+      user-service
+      product-service
+      order-service
+      cart-service
+      payment-service
+      review-service
+      notification-service
+      shipping-service
+      frontend
+      "
+
+      for SERVICE_NAME in $SERVICES; do
+
+        echo ""
+        echo "Building: ${SERVICE_NAME}"
+        echo "Image tag: ${IMAGE_TAG}"
+        echo ""
+
+        buildctl-daemonless.sh build \
+          --progress=quiet \
+          --frontend dockerfile.v0 \
+          --local context=src/shopsphere_e-commerce_microservice_platform \
+          --local dockerfile=src/shopsphere_e-commerce_microservice_platform/${SERVICE_NAME} \
+          --opt filename=Dockerfile \
+          --opt platform=linux/amd64 \
+          --output type=image,name=${REGISTRY_HOST}/${REGISTRY_NAMESPACE}/${SERVICE_NAME}:${IMAGE_TAG},push=true
+
+        echo ""
+        echo "Published:"
+        echo "${REGISTRY_HOST}/${REGISTRY_NAMESPACE}/${SERVICE_NAME}:${IMAGE_TAG}"
+
+      done
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature_.*$/'
+      when: on_success
+
+    - if: '$CI_COMMIT_TAG'
+      when: on_success
+
+# DEPLOY TEMPLATE
+
+.deploy_template:
+  image:
+    name: alpine/helm:4.2.4
+    entrypoint: [""]
+
+  variables:
+    RELEASE_NAME: "shopsphere"
+    NAMESPACE: "shopsphere"
+    REGISTRY_HOST: "registry.gitlab.com/devops-group5062834/devops-project"
+    IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    CREATE_NAMESPACE: "false"
+    # CREATE_NAMESPACE: "true"
+
+  script:
+    - |
+
+      echo ""
+      echo "Deploying ShopSphere"
+      echo "Release:   ${RELEASE_NAME}"
+      echo "Namespace: ${NAMESPACE}"
+      echo "Image tag: ${IMAGE_TAG}"
+      echo ""
+
+      HELM_CREATE_NAMESPACE=""
+      if [ "${CREATE_NAMESPACE}" = "true" ]; then
+        HELM_CREATE_NAMESPACE="--create-namespace"
+      fi
+
+      helm upgrade --install "${RELEASE_NAME}" \
+        ./src/helm-shopsphere \
+        --namespace "${NAMESPACE}" \
+        ${HELM_CREATE_NAMESPACE} \
+        --set global.image.registry="${REGISTRY_HOST}" \
+        --set global.image.tag="${IMAGE_TAG}" \
+        --wait \
+        --timeout 600s
+
+# DEPLOY TEST
+deploy_test:
+  extends: .deploy_template
+  stage: test
+  variables:
+    IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    RELEASE_NAME: "shopsphere"
+    NAMESPACE: "shopsphere"
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature_.*$/'
+      when: on_success
+
+# UNIT TEST
+# Only review-service has unit tests
+unit_test:
+  stage: test
+
+  image:
+    name: eclipse-temurin:17-jdk
+    entrypoint: [""]
+
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - unknown_failure
+
+  cache:
+    key: "maven-review-service"
+    paths:
+      - .m2/repository
+
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+  script:
+    - |
+      set -eu
+
+      echo "=========================================="
+      echo "Running unit tests"
+      echo "Service: review-service"
+      echo "=========================================="
+
+      cd src/shopsphere_e-commerce_microservice_platform
+
+      chmod +x mvnw
+
+      ./mvnw \
+        -pl review-service \
+        -am \
+        -Dtest=ReviewServiceTest \
+        -Dsurefire.failIfNoSpecifiedTests=false \
+        test \
+        -B
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature_.*$/'
+      when: on_success
+
+    - if: '$CI_COMMIT_TAG'
+      when: on_success
+
+# POSTMAN / NEWMAN
+postman_test:
+  stage: test
+
+  image:
+    name: postman/newman:alpine
+    entrypoint: [""]
+
+  needs:
+    - deploy_test
+
+  script:
+    - |
+      set -eu
+
+      echo "=========================================="
+      echo "ShopSphere functional tests"
+      echo "=========================================="
+
+      newman run \
+        src/helm-shopsphere/tests/postman/shopsphere-functional.postman_collection.json \
+        -e \
+        src/helm-shopsphere/tests/postman/shopsphere-functional.postman_environment.json \
+        --reporters cli
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature_.*$/'
+      when: on_success
+
+
+# STAGING
+# Manual only, TAG pipeline only
+staging:
+  extends: .deploy_template
+  stage: staging
+  
+  environment:
+    name: staging
+
+  variables:
+    RELEASE_NAME: "shopsphere"
+    NAMESPACE: "shopsphere"
+    IMAGE_TAG: "$CI_COMMIT_TAG"
+    CREATE_NAMESPACE: "false"
+
+  needs:
+    - unit_test
+
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: manual
+   
+# DESTROY STAGING
+# Remove staging before production
+destroy_staging:
+  image:
+    name: alpine/helm:4.2.4
+    entrypoint: [""]
+
+  stage: cleanup
+
+  variables:
+    RELEASE_NAME: "shopsphere"
+    NAMESPACE: "shopsphere"
+
+  needs:
+    - staging
+
+  script:
+    - |
+      echo ""
+      echo "=========================================="
+      echo "Destroying staging environment"
+      echo "=========================================="
+      echo "Release:   ${RELEASE_NAME}"
+      echo "Namespace: ${NAMESPACE}"
+      echo ""
+
+      helm uninstall "${RELEASE_NAME}" \
+        --namespace "${NAMESPACE}" \
+        --wait
+
+      echo ""
+      echo "Staging environment destroyed."
+      
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: on_success
+
+
+# PRODUCTION
+# Manual only, TAG pipeline only
+prod:
+  extends: .deploy_template
+
+  stage: production
+  
+  environment:
+    name: production
+    
+  variables:
+    RELEASE_NAME: "shopsphere-prod"
+    NAMESPACE: "shopsphere-prod"
+    IMAGE_TAG: "$CI_COMMIT_TAG"
+    CREATE_NAMESPACE: "false"
+
+  needs:
+    - destroy_staging
+
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: manual
+     
+

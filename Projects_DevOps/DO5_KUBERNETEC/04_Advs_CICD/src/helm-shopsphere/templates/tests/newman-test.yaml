@@ -1,0 +1,53 @@
+{{- if .Values.tests.newman.enabled }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-newman
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: newman
+data:
+  collection.json: |-
+{{ .Files.Get "tests/postman/shopsphere-functional.postman_collection.json" | indent 4 }}
+  environment.json: |-
+{{ .Files.Get "tests/postman/shopsphere-functional.postman_environment.json" | indent 4 }}
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-newman-test
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: newman
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+
+  containers:
+    - name: newman
+      image: {{ .Values.tests.newman.image }}
+      command:
+        - newman
+        - run
+        - /tests/collection.json
+        - -e
+        - /tests/environment.json
+        - --reporters
+        - cli
+
+      volumeMounts:
+        - name: newman-tests
+          mountPath: /tests
+          readOnly: true
+
+  volumes:
+    - name: newman-tests
+      configMap:
+        name: {{ .Release.Name }}-newman
+
+{{- end }}
