@@ -1,0 +1,102 @@
+stages:
+  - build
+  - code_style
+  - integration_tests
+  - notify_ci
+  - deploy
+
+build_job:
+  stage: build
+  tags:
+    - do6
+    - ci
+  script:
+    - echo "Начинаем процесс сборки DO ..."
+    - cd code-samples
+    - make
+    - echo "Сборка DO завершена УСПЕШНО"
+  artifacts:
+    paths:
+      - code-samples/DO
+    expire_in: 30 days
+
+code_style_job:
+  stage: code_style
+  tags:
+    - do6
+    - ci
+  script:
+    - echo "Начинаем процесс проверки кодстайла ..."
+    - cp materials/linters/.clang-format code-samples/.clang-format
+    - cd code-samples
+    - clang-format -n --Werror main.c
+    - echo "Кодстайл пройден УСПЕШНО"
+
+integration_test_job:
+  stage: integration_tests
+  tags:
+    - do6
+    - ci
+  needs:
+    - build_job
+    - code_style_job
+  script:
+    - echo "Запуск интеграционных тестов..."
+    - chmod +x src/integration_tests.sh
+    - cd src
+    - bash integration_tests.sh
+    - echo "Интеграционные тесты пройдены УСПЕШНО"
+
+notify_ci_success:
+  stage: notify_ci
+  tags:
+    - do6
+    - ci
+  needs:
+    - build_job
+    - code_style_job
+    - integration_test_job
+  when: on_success
+  script:
+    - chmod +x src/notify.sh
+    - bash src/notify.sh "🛜 CI этап ✅ выполнен успешно"
+
+notify_ci_failure:
+  stage: notify_ci
+  tags:
+    - do6
+    - ci
+  needs:
+    - build_job
+    - code_style_job
+    - integration_test_job
+  when: on_failure
+  script:
+    - chmod +x src/notify.sh
+    - bash src/notify.sh "❌ CI этап провалился"
+
+deploy_job:
+  stage: deploy
+  tags:
+    - do6
+    - ci
+  needs:
+    - build_job
+    - code_style_job
+    - integration_test_job
+    - notify_ci_success
+  when: manual
+  script:
+    - echo "Запуск деплоя..."
+    - chmod +x src/deploy.sh
+    - cd src
+    - bash deploy.sh
+    - echo "Деплой завершён УСПЕШНО"
+  after_script:
+    - chmod +x src/notify.sh
+    - |
+      if [ "$CI_JOB_STATUS" = "success" ]; then
+        bash src/notify.sh "🚀 CD этап ✅ выполнен успешно"
+      else
+        bash src/notify.sh "‼️CD этап ❌ провалился‼️"
+      fi
