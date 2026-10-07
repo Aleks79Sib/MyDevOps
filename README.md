@@ -26,8 +26,8 @@
 
 ### 3. [Monitoring](./Projects_DevOps/DO3_Monitoring):
   - [Bash Scripts](./Projects_DevOps/DO3_Monitoring/Bash_scripts_Linux/BASH_SCRIPTS.MD)
-  - [Simple Monitoring](./Projects_DevOps/DO3_Monitoring/SimpleMonitoring/REPORT.md)
-  - [Monitoring services](./Projects_DevOps/DO3_Monitoring/Monitoring_Services/src/REPORT.MD)
+  - [Simple Monitoring](./Projects_DevOps/DO3_Monitoring/SimpleMonitoring/SIMPLE_MONITORING.md)
+  - [Monitoring services](./Projects_DevOps/DO3_Monitoring/Monitoring_Services/src/SERVICE_MONITORING.MD)
   
 
 ### 4. [Docker](./Projects_DevOps/DO4_DOCKER/):
