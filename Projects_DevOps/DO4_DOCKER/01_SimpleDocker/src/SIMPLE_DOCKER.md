@@ -3,33 +3,62 @@
 ## 1. Готовый докер
 
 - Скачивание официального образа nginx
-```
+```bash
 docker pull nginx
+```
+```
+Using default tag: latest
+latest: Pulling from library/nginx
+b496ef725cba: Pull complete 
+bbeda6b4abb7: Pull complete 
+a0eaca4f4a89: Pull complete 
+848dbae53a0f: Pull complete 
+c6d8c112974b: Pull complete 
+95266651b1b5: Pull complete 
+74db6078a267: Pull complete 
+58f461baacaf: Download complete 
+10ef391a6a66: Download complete 
+Digest: sha256:f9ea18bfa4fad859e1ed38259d711da7ccad2c3516e875cec3351a57c859f571
+Status: Downloaded newer image for nginx:latest
+docker.io/library/nginx:latest
+
 ```
 
 - Проверка наличия образа
-```
+```bash
 docker images nginx
 ```
-
-- Создание и запуск контейнера
 ```
-docker run -d nginx d607865cd608
+                                                                               i Info →   U  In Use
+IMAGE          ID             DISK USAGE   CONTENT SIZE   EXTRA
+nginx:latest   f9ea18bfa4fa        261MB           65MB        
+```
+- Создание и запуск контейнера
+```bash
+docker run -d nginx
 ```
 
 
 -  Проверка, что контейнер запущен
-```
+```bash
 docker ps
 ```
-![docker ps](./part_1/images/image_1.png)
+```
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS     NAMES
+d3a28529698e   nginx     "/docker-entrypoint.…"   13 seconds ago   Up 13 seconds   80/tcp    gallant_engelbart
+
+```
 
 -  Информация о контейнере (docker inspect)
+```bash
+docker inspect d3a28529698e
+docker inspect --size d3a28529698e | grep -E '"SizeRootFs"|"SizeRw"'
 ```
-docker inspect 5706cae7e821
-docker inspect --size 5706cae7e821 | grep -E '"SizeRootFs"|"SizeRw"'
 ```
-- **Размер контейнера (SizeRootFs):** 180,953,022 байт (~185 MB)
+ "SizeRw": 81920,
+        "SizeRootFs": 196067328,
+```
+- **Размер контейнера (SizeRootFs):** 196,067,328 байт (~185 MB)
 
 - **Слой записи (SizeRw):** 1095 байт
 
@@ -38,35 +67,24 @@ docker inspect --size 5706cae7e821 | grep -E '"SizeRootFs"|"SizeRw"'
 
 - **IP контейнера:** 172.17.0.2
 
-![docker inspect](./part_1/images/docker_inspect_size_ip.png)
-
-![docker inspect](./part_1/images/docker_inspect_1.png)
-
-![docker inspect](./part_1/images/docker_inspect_2.png)
-
-![docker inspect](./part_1/images/docker_inspect_3.png)
-
-![docker inspect](./part_1/images/docker_inspect_4.png)
 
 - Остановка контейнера
-```
-docker stop 5706cae7e821
+```bash
+docker stop d3a28529698e
 ```
 
 -  Проверка, что контейнер остановлен
-```
+```bash
 docker ps
 ```
 
-![docker ps after stop](./part_1/images/docker_stop.png)
-
 - Запуск контейнера с пробросом портов 80 и 443
-```
+```bash
 docker run -d -p 80:80 -p 443:443 nginx
 ```
-![docker run with ports](./part_1/images/docker_run_ports_80_443.png)
 
-- Проверка доступности nginx по адресу localhost:80
+
+- Проверка доступности nginx по адресу localhost:81
 ```
 curl -s http://127.0.0.1:80
 ```
@@ -75,12 +93,39 @@ curl -s http://127.0.0.1:80
 
 Стартовая страница **nginx** доступна по адресу `127.0.0.1:80` (заголовок: "Welcome to nginx!").
 
-![nginx welcome page](./part_1/images/docker_browser_nginx.png)
+```
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+```
 
 - Перезапуск контейнера
-```
-docker restart
-# Заново запускал контейнер  поэтому id контейнера изменился на 649430a9d8b3
+```bash
+docker restart 270e86b85091
+
 docker ps
 ```
 ![docker restart](./part_1/images/docker_restart.png)
@@ -91,8 +136,8 @@ docker ps
 
 - Прочитал конфигурационный файл nginx.conf внутри докер контейнера через команду exec.
 
-```
-docker exec 649430a9d8b3 cat /etc/nginx/nginx.conf
+```bash
+docker exec 270e86b85091 cat /etc/nginx/nginx.conf
 
 user  nginx;
 worker_processes  auto;
@@ -127,7 +172,7 @@ http {
 }
 
 ```
-![docker exec cat nginx.conf](./part_2/images/docker_exec_cat_nginx_conf.png)
+
 
 - Создал на локальной машине файл nginx.conf.
 
@@ -144,7 +189,6 @@ server {
     }
 }
 ```
-![nginx.conf](./part_2/images/vim_nginx_conf.png)
 
 - Настроил в нем по пути /status отдачу страницы статуса сервера nginx.
 
@@ -164,7 +208,7 @@ docker exec 2ec4f4984f5e nginx -s reload
 
 - Проверил, что по адресу localhost:80/status отдается страничка со статусом сервера nginx.
 
-```
+```bash
 curl http://127.0.0.1:80/status
 
 Active connections: 1
@@ -173,61 +217,49 @@ server accepts handled requests
 Reading: 0 Writing: 1 Waiting: 0
 ```
 
-![docker cp _ reload](./part_2/images/docker_cp_nginx_conf_reload.png)
-
-![curl /status](./part_2/images/localhost_status.png)
-
-
 - Экспортировал контейнер в файл container.tar через команду export.
 
-```
+```bash
 docker export 2ec4f4984f5e -o container.tar
 ```
-![docker export](./part_2/images/container_tar.png)
 
 - Остановил контейнер.
 
-```
+```bash
 docker stop 2ec4f4984f5e
 ```
 
 - Удалил образ через docker rmi [image_id|repository], не удаляя перед этим контейнеры.
 
-```
+```bash
 docker rmi -f nginx
 ```
 
 - Удалил остановленный контейнер.
 
-```
+```bash
 docker rm 2ec4f4984f5e
 ```
-![Удаление и Остановка контейнера](./part_2/images/rmi_rm_docker.png)
 
 - Создал образ из файла container.tar через команду import.
 
-```
+```bash
 docker import container.tar nginx:latest
 ```
 
-![docker import](./part_2/images/import_container.png)
-
 - Создал и запустил контейнер на основе импортированного образа.
 
-```
+```bash
 docker run -d -p 80:80 -p 443:443 nginx-new nginx -g "daemon off;"
 docker ps
 ```
-![docker run](./part_2/images/docker_run_nginx_new.png)
+
 
 - Проверил, что по адресу localhost:80/status отдается страничка со статусом сервера nginx.
 
 ```
 curl http://127.0.0.1:80/status
 ```
-![curl /status ](./part_2/images/curl_new_status.png)
-
-![status after import](./part_2/images/new_status_nginx.png)
 
 ## 3. Мини веб-сервер
 
@@ -261,12 +293,11 @@ gcc -o hello hello.c -I/opt/homebrew/include -L/opt/homebrew/lib -lfcgi
 
 - Запустил мини-сервер через spawn-fcgi на порту 8080
 
-```
+```bash
 spawn-fcgi -p 8080 ./hello
 
 ps aux | grep hello | grep -v grep && lsof -i :8080 | grep LISTEN
 ```
-![spawn-fcgi](./part_3/images/spawn-fcgi.png)
 
 - Написал nginx.conf, проксирующий запросы с 81 порта на 127.0.0.1:8080
 
@@ -293,7 +324,7 @@ http {
 
 - Запустил nginx в Docker с написанной конфигурацией
 
-```
+```bash
 docker run -d -p 81:81 --name nginx-part3 nginx
 docker cp nginx.conf [container_id]:/etc/nginx/nginx.conf
 docker exec [container_id] nginx -s reload
@@ -309,7 +340,7 @@ curl http://127.0.0.1:81
 
 - Положил nginx.conf по пути ./nginx/nginx.conf
 
-```
+```bash
 cd src
 mkdir -p nginx
 cp sever/nginx.conf nginx/nginx.conf
@@ -323,36 +354,27 @@ cp sever/nginx.conf nginx/nginx.conf
 [Dockerfile.part4](Dockerfile.part4)
 
 - Создал докер-образ через docker build при этом указав имя hello-fcgi и тег part_4
-```
+```bash
 # Перейти в src
 cd src
 
 # Запускать из src
 docker build -f Dockerfile.part4 -t hello-fcgi:part_4 .
 ```
-![docker build](./part_4/images/dockerfile_build.png)
 
 - Проверили через docker images hello-fcgi:part_4
 
-```
+```bash
 docker images hello-fcgi:part_4
 ```
 
-![docker images](./part_4/images/docker_images.png)
-
 - Запустили контейнер докер-образ с маппингом 81 порта на 80 на локальной машине и маппингом папки ./nginx внутрь контейнера
 
-```
+```bash
 docker run -d -p 80:81 -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf hello-fcgi:part_4
 ```
 
-![docker run](./part_4/images/docker_run.png)
-
 - Проверили что сайт доступен по адресу http://localhost:80
-
-![localhost](./part_4/images/localhost.png)]
-
-![browser](./part_4/images/browser.png)]
 
 - Допишим в ./nginx/nginx.conf проксирование странички /status, по которой надо отдавать статус сервера nginx.
 
@@ -368,18 +390,11 @@ location /status {
 
 - Перезапустим docker
 
-```
+```bash
 docker restart 7b39e650378f
 ```
 
-![docker restart](./part_4/images/docker_restart.png)
-
 - Проверим, что теперь по localhost:80/status отдается страничка со статусом nginx
-
-![localhost:80/status](./part_4/images/localhost_status.png)
-
-![browser](./part_4/images/browser_status.png)]
-
 
 ## 5. Dockle
 
@@ -387,11 +402,9 @@ docker restart 7b39e650378f
 
 - запустим dockle и проверим образ
 
-```
+```bash
 dockle hello-fcgi:part_4
 ```
-
-![dockle](./part_5/images/dockle_scan.png)
 
 - Выявили следующие ошибки и предупреждения:
 
@@ -412,32 +425,25 @@ INFO	- CIS-DI-0008: Подтвердите безопасность файлов
 
 - Забилдили новый образ
 
-```
+```bash
 docker build -f Dockerfile.part5 -t hello-fcgi:part_5 .
 docker images hello-fcgi:part_5
 ```
 
-![docker_part5](./part_5/images/docker_build.png)
-
 - Запустили скан на уязвимости 
 
-```
+```bash
 dockle hello-fcgi:part_5
 INFO	- CIS-DI-0008: Confirm safety of setuid/setgid files
 # Можем проигнорировать
 ```
 
-![dockle_scan](./part_5/images/dockle_scan_2.png)
-
 - Запустили контейнер и проверили, что все работает
 
-```
+```bash
 sudo docker run -d -p 80:81 -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf hello-fcgi:part_5
 ```
 
-![docker_ps](./part_5/images/docker_ps.png)
-
-![localhost](./part_5/images/localhost.png)]
 
 ## 6. Базовый Docker Compose
 
@@ -453,23 +459,18 @@ sudo docker run -d -p 80:81 -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf hel
 
 - Остановили все запущенные контейнеры.
 
-```
+```bash
 docker stop $(docker ps -a -q)
 ```
 
 - Запустили проект с помощью команд docker compose build и docker compose up.
 
-```
+```bash
 docker ps
 docker compose build
 docker compose up
 docker ps
 ```
-![docker-compose-up](./part_6/images/docker_compose_build_up_d.png)
-
 
 - Проверили, что в браузере по localhost:80 отдается написанная страничка, как и ранее
 
-![http://localhost:80](./part_6/images/browser_localhost.png)
-
-![status](./part_6/images/status.png)
