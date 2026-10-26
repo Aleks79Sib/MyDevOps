@@ -1,0 +1,199 @@
+#version: "3.8"
+
+# ============================================================
+# docker-compose.yml для микросервисного приложения
+# Бронирование отелей — 7 Java-сервисов + |PostgreSQL + RabbitMQ
+# ============================================================
+
+services:
+  # ---------- PostgreSQL (общая БД с 6 базами) ----------
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_s21
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      # init.sql создаёт 6 БД (users_db, hotels_db, ...) при первом запуске
+      - ./services/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # named volume для сохранения данных между перезапусками
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------- RabbitMQ (очередь сообщений) ----------
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      # Создаём своего пользователя (guest может подключаться только с localhost)
+      RABBITMQ_DEFAULT_USER: ${RABBIT_MQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_MQ_PASSWORD}
+    ports:
+      - "5672:5672"   # AMQP (для сервисов)
+      - "15672:15672" # веб-интерфейс (для отладки)
+
+  # ---------- Session Service (простые — только БД) ----------
+  session-service:
+    build: ./services/session-service
+    container_name: session-service
+    restart: unless-stopped
+    ports:
+      - "${SESSION_SERVICE_PORT}:8081"
+    environment:
+      POSTGRES_HOST: postgres_s21
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: users_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ---------- Hotel Service (простые — только БД) ----------
+  hotel-service:
+    build: ./services/hotel-service
+    container_name: hotel-service
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres_s21
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: hotels_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ---------- Payment Service (простые — только БД) ----------
+  payment-service:
+    build: ./services/payment-service
+    container_name: payment-service
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres_s21
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: payments_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ---------- Loyalty Service (простые — только БД) ----------
+  loyalty-service:
+    build: ./services/loyalty-service
+    container_name: loyalty-service
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres_s21
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: balances_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ---------- Report Service (БД + RabbitMQ) ----------
+  report-service:
+    build: ./services/report-service
+    container_name: report-service
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres_s21
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: statistics_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: ${RABBIT_MQ_PORT}
+      RABBIT_MQ_USER: ${RABBIT_MQ_USER}
+      RABBIT_MQ_PASSWORD: ${RABBIT_MQ_PASSWORD}
+      RABBIT_MQ_QUEUE_NAME: ${RABBIT_MQ_QUEUE_NAME}
+      RABBIT_MQ_EXCHANGE: ${RABBIT_MQ_EXCHANGE}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  # ---------- Booking Service (БД + RabbitMQ + HTTP-сервисы) ----------
+  booking-service:
+    build: ./services/booking-service
+    container_name: booking-service
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres_s21
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: reservations_db
+      RABBIT_MQ_HOST: rabbitmq
+      RABBIT_MQ_PORT: ${RABBIT_MQ_PORT}
+      RABBIT_MQ_USER: ${RABBIT_MQ_USER}
+      RABBIT_MQ_PASSWORD: ${RABBIT_MQ_PASSWORD}
+      RABBIT_MQ_QUEUE_NAME: ${RABBIT_MQ_QUEUE_NAME}
+      RABBIT_MQ_EXCHANGE: ${RABBIT_MQ_EXCHANGE}
+      HOTEL_SERVICE_HOST: hotel-service
+      HOTEL_SERVICE_PORT: ${HOTEL_SERVICE_PORT}
+      PAYMENT_SERVICE_HOST: payment-service
+      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
+      LOYALTY_SERVICE_HOST: loyalty-service
+      LOYALTY_SERVICE_PORT: ${LOYALTY_SERVICE_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      hotel-service:
+        condition: service_started
+      payment-service:
+        condition: service_started
+      loyalty-service:
+        condition: service_started
+
+  # ---------- Gateway Service (шлюз — без БД, HTTP-клиент) ----------
+  gateway-service:
+    build: ./services/gateway-service
+    container_name: gateway-service
+    restart: unless-stopped
+    ports:
+      - "${GATEWAY_SERVICE_PORT}:8087"
+    environment:
+      SESSION_SERVICE_HOST: session-service
+      SESSION_SERVICE_PORT: ${SESSION_SERVICE_PORT}
+      HOTEL_SERVICE_HOST: hotel-service
+      HOTEL_SERVICE_PORT: ${HOTEL_SERVICE_PORT}
+      BOOKING_SERVICE_HOST: booking-service
+      BOOKING_SERVICE_PORT: ${BOOKING_SERVICE_PORT}
+      PAYMENT_SERVICE_HOST: payment-service
+      PAYMENT_SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
+      LOYALTY_SERVICE_HOST: loyalty-service
+      LOYALTY_SERVICE_PORT: ${LOYALTY_SERVICE_PORT}
+      REPORT_SERVICE_HOST: report-service
+      REPORT_SERVICE_PORT: ${REPORT_SERVICE_PORT}
+    depends_on:
+      session-service:
+        condition: service_started
+      hotel-service:
+        condition: service_started
+      booking-service:
+        condition: service_started
+      payment-service:
+        condition: service_started
+      loyalty-service:
+        condition: service_started
+      report-service:
+        condition: service_started
+
+# ---------- Volumes (персистентное хранение) ----------
+volumes:
+  postgres_data:

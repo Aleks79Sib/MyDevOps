@@ -1,0 +1,112 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# ============================================================
+# Vagrantfile — универсальный (Linux → libvirt, Mac/Win → VirtualBox)
+# Part 3 — Docker Swarm кластер (3 машины)
+# ============================================================
+
+# --- Автоопределение ОС хоста ---
+# RUBY_PLATFORM содержит архитектуру и ОС
+# linux:   xxx-linux
+# mac:     xxx-darwin
+# windows: xxx-mingw или xxx-mswin
+
+def os_windows?
+  RUBY_PLATFORM =~ /mingw|mswin/
+end
+
+def os_mac?
+  RUBY_PLATFORM =~ /darwin/
+end
+
+def os_linux?
+  RUBY_PLATFORM =~ /linux/
+end
+def arm_mac?
+  RUBY_PLATFORM =~ /arm64-darwin|aarch64-darwin/
+end
+
+# Выбираем провайдера в зависимости от ОС
+provider = if os_linux?
+             :libvirt
+           elsif arm_mac? || os_mac? || os_windows?
+             :virtualbox
+           else
+             :virtualbox  # fallback
+           end
+
+# puts "🔍 Обнаружена ОС: #{RUBY_PLATFORM}"
+# puts "✅ Выбран провайдер: #{provider}"
+
+# Запуск строго последовательно                                                                 
+ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+
+# Путь на хосте, куда сохраним токен
+TOKEN_FILE = File.join(File.dirname(__FILE__), "src", "worker_token")
+
+# ---Общие  настройки ВМ ---
+Vagrant.configure("2") do |config|
+  config.vm.box = if arm_mac? then "bento/ubuntu-22.04" else "generic/ubuntu2204" end
+  config.vm.box_version = "0"
+ 
+  # --- Настройки в зависимости от провайдера ---
+  if provider == :libvirt
+    # ---------- Linux: libvirt (KVM/QEMU) ----------
+    config.vm.provider "libvirt" do |libvirt|
+      libvirt.memory = "1024"
+      libvirt.cpus = 1
+      libvirt.driver = "kvm"  # аппаратная виртуализация
+    end
+    # Для libvirt синхронизация через rsync (по умолчанию)
+    # config.vm.synced_folder "./src", "/home/vagrant/src", type: "rsync"
+
+  else
+    # ---------- Mac / Windows: VirtualBox ----------
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+  end
+                                                                                                                                                                                       
+  # ---------- Manager ----------                                                            
+  config.vm.define "manager01" do |node|                                                     
+    node.vm.hostname = "manager01"
+    node.vm.network "private_network", ip: "192.168.100.100"                                                                                                     
+    #node.vm.synced_folder "./src", "/home/vagrant/src", type: "nfs"
+    if provider == :virtualbox                                                                  
+      node.vm.network "forwarded_port", guest: 8087, host: 8087                                 
+      node.vm.network "forwarded_port", guest: 8081, host: 8081                                 
+    end                                                                                                              
+    node.vm.provision "shell", path: "scripts/install_docker.sh"
+    # Инициализация swarm                                     
+    node.vm.provision "shell", path: "scripts/init_swarm.sh"                                                                                
+  end
+
+  # ---------- Worker 1 ----------                                                           
+  config.vm.define "worker01" do |node|                                                      
+    node.vm.hostname = "worker01"
+    node.vm.network "private_network", ip: "192.168.100.101"
+    #node.vm.synced_folder "./src", "/home/vagrant/src", type: "nfs"                                                                                                                                                                                                     
+    node.vm.provision "shell", path: "scripts/install_docker.sh"
+
+    # Закидываем токен, полученный от manager01, до запуска join_swarm.sh
+    node.vm.provision "shell", privileged: false, inline: "mkdir -p /home/vagrant/src"
+    node.vm.provision "file", source: "scripts/worker_token", destination: "/home/vagrant/src/worker_token"
+
+    node.vm.provision "shell", path: "scripts/join_swarm.sh"                                                                               
+  end                                                                                                                                                                              
+  # ---------- Worker 2 ----------                                                           
+  config.vm.define "worker02" do |node|                                                      
+    node.vm.hostname = "worker02"
+    node.vm.network "private_network", ip: "192.168.100.102"
+    #node.vm.synced_folder "./src", "/home/vagrant/src", type: "rsync"                                                                                                                                                                                              
+    node.vm.provision "shell", path: "scripts/install_docker.sh"
+    
+    # Закидываем токен, полученный от manager01, до запуска join_swarm.sh
+    node.vm.provision "shell", privileged: false, inline: "mkdir -p /home/vagrant/src"
+    node.vm.provision "file", source: "scripts/worker_token", destination: "/home/vagrant/src/worker_token"
+
+    node.vm.provision "shell", path: "scripts/join_swarm.sh"                                                                                    
+  end                      
+end
