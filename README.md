@@ -32,7 +32,7 @@
 
 ### 4. [Docker](./Projects_DevOps/DO4_DOCKER/):
   - [Simple Docker](./Projects_DevOps/DO4_DOCKER/01_SimpleDocker/src/SIMPLE_DOCKER.md)
-  - [Basic_CI_CD](./Projects_DevOps/DO4_DOCKER/02_Basic_CI_CD_Gitlab/src/REPORT.md)
+  - [Basic_CI_CD](./Projects_DevOps/DO4_DOCKER/02_Basic_CI_CD_Gitlab/src/Basic_CICD.md)
 
 ### 5. [Kubernetec](./Projects_DevOps/DO5_KUBERNETEC/)
 
@@ -46,7 +46,7 @@
 
 сейчас у меня развернуты сервисы:
 
-- n8n ( для автоматизации процессов)
+- n8n ( для автоматизации процессов = sandbox для N8N AI assistant)
 - vaultwarden (хранилище секретов)
 - minikube (Kubernetes -для тестирования )
 - nextcloud (облако и в качестве мессенджера)
@@ -54,9 +54,11 @@
 - netbird (proxy )
 - redis
 - ollama
+- llama.cp ( Qwen3.6-35B) -local
 - agent PI
 - homeassistent(умный дом)
 - jellyfin (свой медиацентр)
+- worldpress + mysql (для 2 сайта портфолио)
 
 Остальные по мере необходимости или тестирвоания
 
@@ -121,10 +123,11 @@
 
 ### 7. Развертывание ИИ агентов и различные модели 
 
-*моя любимая тема с ИИ*
+*Тема с ИИ*
 
 - [Agent PI](./HomeServer/docs/18_install_agent_pi_with_docker.md)
 - [OLLAMA](./HomeServer/docs/22_install_llm_ollama.md)
+- [Llama.cp](Инструкция в разработке ...)
 
 ### 8. [Monitoring](./HomeServer/docs/13-monitoring.md)
 
