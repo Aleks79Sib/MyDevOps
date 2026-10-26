@@ -81,7 +81,7 @@
 
 [Firewall, Fail2ban ](./HomeServer/docs/09-security.md)
 
-Дополнительная безопасность можно настроить g‼️port knocking‼️
+Дополнительная безопасность можно настроить ‼️port knocking‼️
 
 
 ### 3. Docker services (docker compose)
