@@ -36,7 +36,7 @@
 
 Схема сервисов
 
-![диаграмма](../misc/images/project_diagram.png)
+![диаграмма](../docs/screenshots/project_diagram.png)
 
 [booking_service/Dokerfile](./services/booking-service/Dockerfile)
 
@@ -497,7 +497,7 @@ report-service    src-report-service       Up                      8086
 gateway-service   src-gateway-service      Up                      8087
 ```
 
-![docker images](./screenshots/images_docker.png)
+![docker images](../docs/screenshots/images_docker.png)
 
 #### 1.4 Тестирование через Postman
 
@@ -508,18 +508,18 @@ gateway-service   src-gateway-service      Up                      8087
 
 **Запуск тестирования**
 
-![Запуск коллекции](./screenshots/run_test.png)
+![Запуск коллекции](../docs/screenshots/run_test.png)
 
 **Результаты тестирования:**
 
-![Тест 1 - Login User](./screenshots/test1.png)
-![Тест 2 - Get Hotles](./screenshots/test2.png)
-![Тест 3 - Get Hotel](./screenshots/test3.png)
-![Тест 4 - POST Book Hotel](./screenshots/test4.png)
-![Тест 5 - Get User's Loyalty Balance Get Booking](./screenshots/test5.png)
+![Тест 1 - Login User](../docs/screenshots/test1.png)
+![Тест 2 - Get Hotles](../docs/screenshots/test2.png)
+![Тест 3 - Get Hotel](../docs/screenshots/test3.png)
+![Тест 4 - POST Book Hotel](../docs/screenshots/test4.png)
+![Тест 5 - Get User's Loyalty Balance Get Booking](../docs/screenshots/test5.png)
 
 **Общий результат**
-![Результаты всех тестов](./screenshots/test_all_postman.png)
+![Результаты всех тестов](../docs/screenshots/test_all_postman.png)
 
 #### 1.5 Отчёт по размерам образов
 
@@ -578,7 +578,7 @@ IMAGE          CREATED        CREATED BY                                        
 
 #### Результаты тестирования Postman
 
-![Результаты тестов Postman](./screenshots/test_all_postman.png)
+![Результаты тестов Postman](../docs/screenshots/test_all_postman.png)
 
 **Все 5 тестов пройдены успешно** 
 
@@ -656,9 +656,9 @@ vagrant up --provider=libvirt
 cd /Users/leik.van-23/ProjectsVSC/02_DO_Devops/DO7_Docker_Compose_ID_1219717-1
 vagrant up          # запуск VM (~5 мин в первый раз)
 ```
-![vagrant up ](./screenshots/up_vagrant_1.png)
+![vagrant up ](../docs/screenshots/up_vagrant_1.png)
 
-![vagrant up finish](./screenshots/up_vagrant_2_docker.png)
+![vagrant up finish](../docs/screenshots/up_vagrant_2_docker.png)
 
 #### Результат
 
@@ -670,12 +670,12 @@ docker-compose.yml  .env  REPORT.md  services/
 vagrant@docker-host:~$ docker --version
 Docker version 27.x.x
 ```
-![docker-host-vagrant](./screenshots/docker_version_vagrant.png)
+![docker-host-vagrant](../docs/screenshots/docker_version_vagrant.png)
 
 ```bash                   # выйти
 vagrant destroy -f  # уничтожить VM
 ```
-![vagrant](./screenshots/destoy_vagrant.png)
+![vagrant](../docs/screenshots/destoy_vagrant.png)
 
 ---
 
@@ -743,7 +743,7 @@ ril6inmkn3cqrgca5fq5eek72    worker02    Ready     Active                       
                   
 ```                
 
-![Результат](./screenshots/status_vagrant.png)
+![Результат](../docs/screenshots/status_vagrant.png)
 
   ---                                                                                                             
 ### Задание 2. Загрузка образов на Docker Hub                                                 
@@ -756,7 +756,7 @@ ril6inmkn3cqrgca5fq5eek72    worker02    Ready     Active                       
   # ... для всех 7 сервисов                                                                       
 ```
 
-![Образы на Hub](./screenshots/hub_images_docker.png)
+![Образы на Hub](../docs/screenshots/hub_images_docker.png)
                                                    
                                                                                                   
 - [x] Перенести docker-compose.yml на manager
@@ -803,9 +803,9 @@ cd src
 
 - [x] docker stack services s21
 
-![Результат деплоя](./screenshots/deploy_docker_swarm.png)
+![Результат деплоя](../docs/screenshots/deploy_docker_swarm.png)
 
-![status](./screenshots/docker_stack_vagrant_manager01.png)
+![status](../docs/screenshots/docker_stack_vagrant_manager01.png)
                      
  ### Задание 4. nginx proxy
 
@@ -830,7 +830,7 @@ cd src
  - localhost:30007/api/v1/gateway/hotels → ❌ Connection refused (заблокирован)                    
  - localhost:30001/api/v1/auth/authorize → ❌ Connection refused (заблокирован)
 
-![Session Block](./screenshots/ssesion_block.png)                 
+![Session Block](../docs/screenshots/ssesion_block.png)                 
                                                                                                    
  ### Задание 5. Postman тесты                                                                    
                                                                                                    
@@ -838,21 +838,21 @@ cd src
  Запуск туннеля ssh -L 30080:192.168.100.100:30080 username#server -p 22                                                                                                
  **Результаты тестирования:**
 
-![Тест 1 - Login User](./screenshots/swarm_test1.png)
-![Тест 2 - Get Hotles](./screenshots/swarm_test2.png)
-![Тест 3 - Get Hotel](./screenshots/swarm_test3.png)
-![Тест 4 - POST Book Hotel](./screenshots/swarm_test4.png)
-![Тест 5 - Get User's Loyalty Balance Get Booking](./screenshots/swarm_test5.png)
+![Тест 1 - Login User](../docs/screenshots/swarm_test1.png)
+![Тест 2 - Get Hotles](../docs/screenshots/swarm_test2.png)
+![Тест 3 - Get Hotel](../docs/screenshots/swarm_test3.png)
+![Тест 4 - POST Book Hotel](../docs/screenshots/swarm_test4.png)
+![Тест 5 - Get User's Loyalty Balance Get Booking](../docs/screenshots/swarm_test5.png)
 
  ### Задание 6. Распределение контейнеров по узлам                                               
                                                                  
- ![Статус](./screenshots/docker_stack_ps_manager01.png)                            
+ ![Статус](../docs/screenshots/docker_stack_ps_manager01.png)                            
                                                                                                    
  ### Задание 7. Portainer                                                                        
                                                                                                    
  Portainer 2.19.5 установлен отдельным стеком на кластере:
 
-![deploy portainer](./screenshots/portainer_deploy.png)
+![deploy portainer](../docs/screenshots/portainer_deploy.png)
 
  - portainer_portainer — веб-интерфейс (порт 9000)
 
@@ -860,17 +860,17 @@ cd src
 
  Запуск туннеля ssh -L 9000:192.168.100.100:9000 username#server -p 22 
 
- ![Portainer Dashboard](./screenshots/dashboard_portainer.png)
+ ![Portainer Dashboard](../docs/screenshots/dashboard_portainer.png)
 
-  ![services portainer](./screenshots/services_portainer.png)
+  ![services portainer](../docs/screenshots/services_portainer.png)
 
- ![Containers Portainer](./screenshots/containers_portainer.png)
+ ![Containers Portainer](../docs/screenshots/containers_portainer.png)
 
 
 
- ![swarm portainer](./screenshots/swarm_portainer.png)
+ ![swarm portainer](../docs/screenshots/swarm_portainer.png)
 
- ![Cluster_visualizer](./screenshots/Cluster_visualizer_Portainer.png)
+ ![Cluster_visualizer](../docs/screenshots/Cluster_visualizer_Portainer.png)
 
  
 
