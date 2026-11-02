@@ -38,6 +38,9 @@
 
 ### 5. [Kubernetec](./Projects_DevOps/DO5_KUBERNETEC/)
 
+  - [Basic-K8s](в разработке)
+  - [Advance-K8s](в разработке)
+  - [Helm](в разработке)
   - [AdvK8s_CICD](./Projects_DevOps/DO5_KUBERNETEC/04_Advs_CICD/src/REPORT.MD)
 
 ## Мой первый собственный HomeServer
