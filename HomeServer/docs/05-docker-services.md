@@ -4,28 +4,72 @@
 
 ## 1. Установка Docker и Docker Compose
 
+1. Если есть удалите старые пакеты
+
 ```bash
-# Установить Docker
-sudo apt install -y docker.io docker-compose
+for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove -y $pkg; done
+```
+2. Подключите официальный репозиторий Docker
 
-# Добавить пользователя в группу docker (чтобы не писать sudo)
+```bash
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+```
+
+3. Установите Docker и Compose
+
+```bash
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+Пакет docker-compose-plugin и есть Docker Compose v2.
+
+4. Проверьте установку
+
+```bash
+sudo docker run hello-world
+docker compose version
+```
+5. (Рекомендуется) Запуск без sudo
+
+```bash
 sudo usermod -aG docker $USER
-# Применить без выхода:
 newgrp docker
+```
+После этого перезайдите в сессию, чтобы группа применилась везде.
 
+Если репозиторий Docker недоступен из вашего региона, есть запасной вариант с Ubuntu-репозиториев:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y docker.io docker-compose-v2 # Старая версия
+```
+Версии там немного старее, но работает так же: docker compose up -d.
+
+Важно: команда docker-compose (через дефис) это старый Compose v1, он больше не поддерживается. Используйте docker compose (через пробел)
+
+```bash
 # Проверить установку
 docker --version
-docker-compose --version
+docker-compose --version # Старая версия
 ```
 
 ### Проверка
 
 ```bash
-# Запустить тестовый контейнер
-docker run hello-world
-
 # Посмотреть запущенные контейнеры
 docker ps
+sudo docker stop hello-world
 ```
 
 ### Если Docker не работает
@@ -42,6 +86,7 @@ ssh username@192.168.50.100 -p 2222
 # Проверить снова
 docker run hello-world
 docker ps
+docker stop hello-world
 ```
 
 ### Создать рабочую директорию
