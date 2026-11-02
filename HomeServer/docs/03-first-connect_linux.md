@@ -88,7 +88,7 @@ network:
   ethernets:
     enp0s3:                         # заменить на свой интерфейс
       addresses:
-        - 192.168.1.100/24         # нужный статический IP
+        - 192.168.10.200/24         # нужный статический IP
       routes:
         - to: default
           via: 192.168.1.1          # шлюз (роутер)
@@ -160,8 +160,7 @@ sudo apt install zram-tools
 # Отредактировать: sudo nano /etc/default/zramswap, добавить PERCENT=50
 
 # Базовые утилиты
-sudo apt install -y htop btop ncdu neofetch git curl wget unzip \
-                    ufw fail2ban net-tools nmap autossh
+sudo apt install -y htop btop ncdu git curl wget unzip jq ufw fail2ban net-tools nmap autossh
 ```
 
 ### 7.3. Настроить часовой пояс
