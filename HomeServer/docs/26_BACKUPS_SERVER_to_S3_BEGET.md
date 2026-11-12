@@ -36,7 +36,7 @@ rclone v1.60.1-DEV
 rclone config
 
 # Далее
-2026/05/29 20:13:53 NOTICE: Config file "/home/lorydari/.config/rclone/rclone.conf" not found - using defaults
+2026/05/29 20:13:53 NOTICE: Config file "~/.config/rclone/rclone.conf" not found - using defaults
 No remotes found, make a new one?
 n) New remote
 s) Set configuration password
@@ -167,7 +167,7 @@ Options:
 - access_key_id: 9BXXXXXXXXXXX6
 - secret_access_key: ZZZZZZZZZZZZZZZZZZ
 - region: ru1
-- endpoint: https://5ad68715e105-intelligent-stream.s3.ru1.storage.beget.cloud
+- endpoint: https://5ad6kddfk05-intelligent-stream.s3.ru1.storage.beget.cloud
 - acl: private
 Keep this "beget" remote?
 y) Yes this is OK (default)
@@ -216,9 +216,8 @@ S3_REMOTE="beget"
 S3_PATH="n8n-backups"
 
 # Папки для бэкапа (bind mounts)
-POSTGRES_V2_DATA="/var/lib/postgresql/data_v2"
 POSTGRES_DATA="/var/lib/postgresql/data"
-N8N_DATA="/var/lib/postgresql/n8n_v2_data"
+N8N_DATA="/var/lib/postgresql/n8n_data2"
 NEXTCLOUD_DATA="/var/lib/postgresql/nextcloud_data"
 VAULTWARDEN_DATA="/var/lib/vaultwarden_data"
 QDRANT_DATA="/var/lib/postgresql/qdrant_storage"
@@ -298,7 +297,7 @@ sudo chmod +x /usr/local/bin/backup_all.sh
 ```bash
 crontab -e
 
-no crontab for lorydari - using an empty one
+no crontab for username - using an empty one
 
 Select an editor.  To change later, run 'select-editor'.
   1. /bin/nano        <---- easiest
@@ -323,9 +322,9 @@ sudo chmod +x /usr/local/bin/backup_all.sh
 # Вывод
 [Fri May 29 21:42:44 MSK 2026] Начинаем бэкап всех сервисов...
 >>> Дамп PostgreSQL (основная)...
-    Дамп создан (пользователь: lorydari)
+    Дамп создан (пользователь: username)
 >>> Дамп PostgreSQL_v2 (n8n)...
-    Дамп создан (пользователь: lorydari)
+    Дамп создан (пользователь: username)
 >>> Архив n8n...
 >>> Архив Nextcloud...
 >>> Архив Vaultwarden...
