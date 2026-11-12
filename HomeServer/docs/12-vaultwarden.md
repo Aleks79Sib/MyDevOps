@@ -43,9 +43,9 @@ systemctl restart cloudflared
 
 ---
 
-## 3. Добавить Vaultwarden в docker-compose.yml
+## 3. Добавить Vaultwarden в docker compose.yml
 
-Добавить в `~/docker/server/docker-compose.yml`:
+Добавить в `~/docker/server/docker compose.yml`:
 
 ```yml
 vaultwarden:
@@ -76,8 +76,8 @@ VW_DATABASE_URL=postgres://vaultwarden:пароль@postgres:5432/vault
 ```
 
 ```bash
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 ```
 
 ---

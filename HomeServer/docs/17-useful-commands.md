@@ -6,11 +6,11 @@
 
 ```bash
 # Перезапустить все сервисы
-docker-compose restart
+docker compose restart
 
 # Обновить все образы и перезапустить
-docker-compose pull
-docker-compose up -d
+docker compose pull
+docker compose up -d
 
 # Экспорт workflows из n8n
 docker exec -u node n8n n8n export:workflow --all --output=/home/node/workflows.json
@@ -82,7 +82,7 @@ du -sh /* 2>/dev/null | sort -rh | head -10
 
 ```bash
 # Логи Docker-сервиса
-docker-compose logs -f [service_name]
+docker compose logs -f [service_name]
 
 # Все логи системы
 sudo journalctl -f
@@ -130,8 +130,8 @@ nano ~/.ssh/config
 Пример конфига:
 
 ```text
-Host homeserver
-    HostName 192.168.1.100
+Host myserver
+    HostName 192.168.50.100
     Port 2222
     User admin
     IdentityFile ~/.ssh/id_ed25519
@@ -139,7 +139,7 @@ Host homeserver
 
 ```bash
 # Подключаться теперь можно так:
-ssh homeserver
+ssh myserver
 ```
 
 ---

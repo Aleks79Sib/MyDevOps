@@ -7,7 +7,7 @@
 1. Если есть старые пакеты - удалите для версии v2
 
 ```bash
-for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove -y $pkg; done
+for pkg in docker.io docker-doc docker compose docker compose-v2 podman-docker containerd runc; do sudo apt-get remove -y $pkg; done
 ```
 2. Подключите официальный репозиторий Docker
 
@@ -29,10 +29,10 @@ sudo apt-get update
 3. Установите Docker и Compose
 
 ```bash
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker compose-plugin
 ```
 
-Пакет docker-compose-plugin и есть Docker Compose v2.
+Пакет docker compose-plugin и есть Docker Compose v2.
 
 4. Проверьте установку
 
@@ -52,16 +52,16 @@ newgrp docker
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y docker.io docker-compose-v2 # Старая версия
+sudo apt-get install -y docker.io docker compose-v2 # Старая версия
 ```
 Версии там немного старее, но работает так же: docker compose up -d.
 
-Важно: команда docker-compose (через дефис) это старый Compose v1, он больше не поддерживается. Используйте docker compose (через пробел)
+Важно: команда docker compose (через дефис) это старый Compose v1, он больше не поддерживается. Используйте docker compose (через пробел)
 
 ```bash
 # Проверить установку
 docker --version
-docker-compose --version # Старая версия
+docker compose --version # Старая версия
 ```
 
 ### Проверка
@@ -100,11 +100,11 @@ cd ~/docker
 
 ## 2. Файлы конфигурации
 
-### docker-compose.yml
+### docker compose.yml
 
-Пример файла `docker-compose.yml` находится в папке проекта:
+Пример файла `docker compose.yml` находится в папке проекта:
 
-👉 [`../scripts/docker-compose.yml`](../scripts/docker-compose.yml)
+👉 [`../scripts/docker compose.yml`](../scripts/docker compose.yml)
 
 Скопируйте его на сервер:
 
@@ -113,7 +113,7 @@ cd ~/docker
 mkdir -p ~/docker/server
 ```
 
-Затем создайте или скопируйте `docker-compose.yml` в `~/docker/server/`.
+Затем создайте или скопируйте `docker compose.yml` в `~/docker/server/`.
 
 ### .env — переменные окружения
 
@@ -280,10 +280,10 @@ docker exec n8n tail -f /home/node/.n8n/logs/output.log
 docker images
 
 # Скачать/обновить образ конкретного сервиса
-docker-compose pull n8n
+docker compose pull n8n
 
 # Обновить все образы
-docker-compose pull
+docker compose pull
 
 # Удалить неиспользуемые образы
 docker image prune
@@ -373,7 +373,7 @@ du -sh /var/lib/docker/containers/*/*-json.log 2>/dev/null | sort -rh | head -10
 # Очистить логи конкретного контейнера
 sudo truncate -s 0 /var/lib/docker/containers/$(docker ps -q --filter name=n8n)/*-json.log
 
-# Или глобально — ограничить размер логов в docker-compose.yml:
+# Или глобально — ограничить размер логов в docker compose.yml:
 Добавить в сервис:
   logging:
     driver: json-file
@@ -389,7 +389,7 @@ sudo truncate -s 0 /var/lib/docker/containers/$(docker ps -q --filter name=n8n)/
 Добавьте в `~/.bashrc`:
 
 ```bash
-alias server='cd ~/docker/server && docker-compose'
+alias server='cd ~/docker/server && docker compose'
 alias servers='cd ~/docker/server'
 
 # Примеры использования:
@@ -411,9 +411,9 @@ source ~/.bashrc
 
 | Сценарий | Команда |
 |----------|---------|
-| Запустить всё в первый раз | `docker-compose up -d` |
-| Перезапустить только n8n | `docker-compose restart n8n` |
-| Посмотреть логи n8n | `docker-compose logs -f n8n` |
+| Запустить всё в первый раз | `docker compose up -d` |
+| Перезапустить только n8n | `docker compose restart n8n` |
+| Посмотреть логи n8n | `docker compose logs -f n8n` |
 | Зайти внутрь n8n | `docker exec -it n8n bash` |
 | Зайти в PostgreSQL | `docker exec -it postgres psql -U user -d db` |
 | Скопировать БД из postgres | `docker exec postgres pg_dumpall -U user > backup.sql` |
@@ -421,6 +421,6 @@ source ~/.bashrc
 | Посмотреть занятую память | `docker stats --no-stream` |
 | Удалить образы без тега | `docker image prune` |
 | Очистить логи journald | `sudo journalctl --vacuum-time=7d` |
-| Остановить всё, сохранить данные | `docker-compose down` |
-| Остановить всё и удалить volumes (‼️ данные) | `docker-compose down -v` |
-| Обновить все контейнеры | `docker-compose pull && docker-compose up -d` |
+| Остановить всё, сохранить данные | `docker compose down` |
+| Остановить всё и удалить volumes (‼️ данные) | `docker compose down -v` |
+| Обновить все контейнеры | `docker compose pull && docker compose up -d` |
