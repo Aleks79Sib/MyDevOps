@@ -4,13 +4,13 @@
   - На Mac: 
 ```bash
 # 1. Сгенерировать ключ Ed25519 (самый безопасный)
-ssh-keygen -t ed25519 -C "username@name-server"
+ssh-keygen -t ed25519 -f ~/.ssh/mykey_vps_ed25519 -C "my key for vps Start name-server"
 
-# 2. Файлы сохранятся в:
-#   ~/.ssh/id_ed25519      ← приватный ключ (НЕ ДЕЛИТЬСЯ!)
-#   ~/.ssh/id_ed25519.pub  ← публичный ключ
+2. Файлы сохранятся в:
+   mykey_vps_ed25519      ← приватный ключ (НЕ ДЕЛИТЬСЯ!)
+   mykey_vps_ed25519.pub  ← публичный ключ
 
-# 3. Проверить что создались
+3. Проверить что создались
 ls -la ~/.ssh/id_ed25519*
 ```
 
@@ -22,7 +22,7 @@ ls -la ~/.ssh/id_ed25519*
 ssh-copy-id username@192.168.50.100
 
 # Или вручную:
-cat ~/.ssh/id_ed25519.pub | ssh username@192.168.50.100 "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+cat ~/.ssh/mykey_vps_ed25519.pub | ssh username@192.168.50.100 "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
 ```
 - **🔧 Шаг 3: Настроить SSH на сервере**
   
@@ -97,13 +97,13 @@ sudo grep -n "Port" /etc/ssh/sshd_config
 # а удаленном другом компьтере ввыполни:
 ssh -p 2222 username@192.168.50.100
 # Возможно выдастошибку если был другой ключ
-ssh-keygen -R [192.168.1.100]:2222
-
-# Если подключение прошло без ошибок, то порт 2222 работает.
-# Закрываем port 22:
-
+ssh-keygen -R [192.168.50.100]:2222
 ```
-- **🔑 Шаг 4: Подключиться к серверу и натсройка autossh**
+> Если подключение прошло без ошибок, то порт 2222 работает.
+> Закрываем port 22:
+
+
+- **🔑 Шаг 4: Подключиться к серверу и настройка autossh**
 
 ```bash
 # 1. Установить autossh
@@ -115,7 +115,6 @@ sudo nano /etc/autossh/config
 # 3. Внести измнения:
 ServerAliveInterval 30
 ServerAliveCountMax 3
-
-
+```
 
 
