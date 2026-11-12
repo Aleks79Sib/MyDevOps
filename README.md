@@ -34,13 +34,13 @@
   - [Simple Docker](./Projects_DevOps/DO4_DOCKER/01_SimpleDocker/src/SIMPLE_DOCKER.md)
   - [Basic_CI_CD](./Projects_DevOps/DO4_DOCKER/02_Basic_CI_CD_Gitlab/src/Basic_CICD.md)
   - [Docker Compose](./Projects_DevOps/DO4_DOCKER/03_Docker_Compose/src/Docker_Compose.md)
-  - [Ansible](В разработке )
+  - [Ansible](./Projects_DevOps/DO4_DOCKER/04_Ansible_Service_Discovery/src/REPORT.md)
 
 ### 5. [Kubernetec](./Projects_DevOps/DO5_KUBERNETEC/)
 
-  - [Basic-K8s](в разработке)
-  - [Advance-K8s](в разработке)
-  - [Helm](в разработке)
+  - [Basic-K8s](./Projects_DevOps/DO5_KUBERNETEC/01_BasicK8s/src/REPORT_Basic_K8s.MD)
+  - [Advance-K8s](./Projects_DevOps/DO5_KUBERNETEC/02_AdvK8s/src/REPORT_Adv_K8s.MD)
+  - [Helm](./Projects_DevOps/DO5_KUBERNETEC/03_Helm/src/REPORT_HELM.MD)
   - [AdvK8s_CICD](./Projects_DevOps/DO5_KUBERNETEC/04_Advs_CICD/src/REPORT.MD)
 
 ## Мой первый собственный HomeServer
