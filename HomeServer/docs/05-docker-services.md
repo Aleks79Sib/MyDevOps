@@ -4,7 +4,7 @@
 
 ## 1. Установка Docker и Docker Compose
 
-1. Если есть удалите старые пакеты
+1. Если есть старые пакеты - удалите для версии v2
 
 ```bash
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove -y $pkg; done
@@ -40,7 +40,7 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 sudo docker run hello-world
 docker compose version
 ```
-5. (Рекомендуется) Запуск без sudo
+5. Запуск без sudo
 
 ```bash
 sudo usermod -aG docker $USER
@@ -197,19 +197,19 @@ echo "мой_пароль" | mkpasswd --method=bcrypt --stdin
 cd ~/docker/server
 
 # Запустить все сервисы (скачать образы + создать контейнеры)
-docker-compose up -d
+docker compose up -d
 
 # Остановить все сервисы (контейнеры удаляются)
-docker-compose down
+docker compose down
 
 # Остановить конкретный сервис
-docker-compose stop n8n
+docker compose stop n8n
 
 # Запустить конкретный сервис
-docker-compose start n8n
+docker compose start n8n
 
 # Перезапустить конкретный сервис
-docker-compose restart n8n
+docker compose restart n8n
 ```
 
 ---
@@ -224,10 +224,10 @@ docker ps
 docker ps -a
 
 # Логи конкретного сервиса (в реальном времени)
-docker-compose logs -f n8n
+docker compose logs -f n8n
 
 # Логи за последние N строк
-docker-compose logs --tail=50 n8n
+docker compose logs --tail=50 n8n
 
 # Статистика по всем контейнерам (CPU, RAM, сеть)
 docker stats
@@ -374,12 +374,12 @@ du -sh /var/lib/docker/containers/*/*-json.log 2>/dev/null | sort -rh | head -10
 sudo truncate -s 0 /var/lib/docker/containers/$(docker ps -q --filter name=n8n)/*-json.log
 
 # Или глобально — ограничить размер логов в docker-compose.yml:
-# Добавить в сервис:
-#   logging:
-#     driver: json-file
-#     options:
-#       max-size: "10m"
-#       max-file: "3"
+Добавить в сервис:
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
 ```
 
 ---
