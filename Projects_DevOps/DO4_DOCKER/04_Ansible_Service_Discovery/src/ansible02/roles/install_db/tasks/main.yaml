@@ -1,0 +1,69 @@
+- name: "Обновление пакетов"
+  shell: apt update
+
+- name: "Установка postgres"
+  shell: apt install -y postgresql
+
+- name: "Запуск postgres"
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: "Создание базы данных hotels_db"
+  shell: |
+    su - postgres -c "psql -c 'DROP DATABASE IF EXISTS hotels_db;'"
+    su - postgres -c "psql -c 'CREATE DATABASE hotels_db;'"
+
+- name: "Установить пароль пользователю postgres"
+  shell: |
+    su - postgres -c "psql -c \"ALTER USER postgres WITH PASSWORD 'greate-hotel_cool!';\""
+
+- name: "Убедиться что consul запущен"
+  systemd:
+    name: consul
+    state: started
+
+- name: "Зарегистрировать postgres как connect-сервис (json)"
+  copy:
+    dest: /etc/consul.d/postgres.json
+    content: |
+      {
+        "service": {
+          "name": "postgres",
+          "port": 5432,
+          "connect": {
+            "sidecar_service": {}
+          }
+        }
+      }
+
+- name: "Перечитать конфиг consul"
+  shell: consul reload
+
+- name: "Создать systemd unit для consul-envoy (postgres sidecar)"
+  copy:
+    dest: /etc/systemd/system/consul-envoy.service
+    content: |
+      [Unit]
+      Description=Consul Envoy Sidecar for postgres
+      After=consul.service postgresql.service
+      Requires=consul.service
+
+      [Service]
+      ExecStart=/usr/local/bin/consul connect envoy -sidecar-for postgres -ignore-envoy-compatibility
+      Restart=on-failure
+      RestartSec=3
+      User=vagrant
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: "Перечитать systemd"
+  shell: systemctl daemon-reload
+
+- name: "Запустить consul-envoy (postgres sidecar)"
+  systemd:
+    name: consul-envoy
+    state: restarted
+    enabled: yes

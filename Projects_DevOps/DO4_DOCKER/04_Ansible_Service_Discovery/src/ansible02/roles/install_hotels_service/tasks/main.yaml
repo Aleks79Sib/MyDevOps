@@ -1,0 +1,151 @@
+- name: "Обновление пакетов"
+  shell: apt update
+
+- name: "Проверить, установлен ли Java 21"
+  shell: java --version 2>&1 | grep -q "21"
+  register: java_check
+  ignore_errors: yes
+
+- name: "Установить Eclipse Temurin JDK 21"
+  shell: |
+    apt install -y wget gnupg
+    wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor -o /usr/share/keyrings/adoptium.gpg
+    echo "deb [signed-by=/usr/share/keyrings/adoptium.gpg] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+    apt update
+    apt install -y temurin-21-jdk
+  when: java_check.failed
+
+- name: "Копирование файлов hotel-services"
+  copy:
+    src: /home/vagrant/src/services/hotel-service
+    dest: /home/vagrant/app02/services/
+    owner: vagrant
+    group: vagrant
+
+- name: "Задать переменные окружения POSTGRES_* (идемпотентно, без дублей)"
+  lineinfile:
+    path: /etc/environment
+    regexp: "^{{ item.key }}="
+    line: '{{ item.key }}="{{ item.value }}"'
+    state: present
+  loop:
+    - { key: "POSTGRES_HOST", value: "127.0.0.1" }
+    - { key: "POSTGRES_PORT", value: "5432" }
+    - { key: "POSTGRES_DB", value: "hotels_db" }
+    - { key: "POSTGRES_USER", value: "postgres" }
+    - { key: "POSTGRES_PASSWORD", value: "greate-hotel_cool!" }
+
+- name: "Собрать jar-файл"
+  shell: |
+    chmod +x /home/vagrant/app02/services/hotel-service/mvnw
+    cd /home/vagrant/app02/services/hotel-service && ./mvnw clean package -DskipTests
+  args:
+    creates: /home/vagrant/app02/services/hotel-service/target/hotel-service-0.0.1-SNAPSHOT.jar
+
+- name: "Убедиться что consul запущен"
+  systemd:
+    name: consul
+    state: started
+
+# --- Регистрация hotel-service как Connect-сервиса с upstream на postgres ---
+- name: "Зарегистрировать hotel-service как connect-сервис с upstream postgres (json)"
+  copy:
+    dest: /etc/consul.d/hotel-service.json
+    content: |
+      {
+        "service": {
+          "name": "hotel-service",
+          "port": 8082,
+          "connect": {
+            "sidecar_service": {
+              "proxy": {
+                "upstreams": [
+                  {
+                    "destination_name": "postgres",
+                    "local_bind_address": "127.0.0.1",
+                    "local_bind_port": 5432
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+
+- name: "Перечитать конфиг consul"
+  shell: consul reload
+
+- name: "Разрешить intention hotel-service -> postgres"
+  shell: consul intention create -allow hotel-service postgres
+  ignore_errors: yes
+
+- name: "Создать systemd unit для consul-envoy (hotel-service sidecar)"
+  copy:
+    dest: /etc/systemd/system/consul-envoy.service
+    content: |
+      [Unit]
+      Description=Consul Envoy Sidecar for hotel-service
+      After=consul.service
+      Requires=consul.service
+
+      [Service]
+      ExecStart=/usr/local/bin/consul connect envoy -sidecar-for hotel-service -ignore-envoy-compatibility
+      Restart=on-failure
+      RestartSec=3
+      User=vagrant
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: "Перечитать systemd"
+  shell: systemctl daemon-reload
+
+- name: "Запустить consul-envoy (hotel-service sidecar)"
+  systemd:
+    name: consul-envoy
+    state: restarted
+    enabled: yes
+
+- name: "Дождаться готовности локального прокси 127.0.0.1:5432"
+  wait_for:
+    host: 127.0.0.1
+    port: 5432
+    timeout: 30
+
+# Запуск самого jar через systemd, ПОСЛЕ того как sidecar поднял локальный прокси 
+- name: "Создать systemd unit для hotel-service, запуск самого jar "
+  copy:
+    dest: /etc/systemd/system/hotel-service.service
+    content: |
+      [Unit]
+      Description=Hotel Service
+      After=consul-envoy.service
+      Requires=consul-envoy.service
+
+      [Service]
+      EnvironmentFile=/etc/environment
+      ExecStart=/usr/bin/java -jar /home/vagrant/app02/services/hotel-service/target/hotel-service-0.0.1-SNAPSHOT.jar
+      Restart=on-failure
+      RestartSec=5
+      User=vagrant
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: "Перечитать systemd"
+  shell: systemctl daemon-reload
+
+- name: "Запустить и включить hotel-service"
+  systemd:
+    name: hotel-service
+    state: restarted
+    enabled: yes
+
+- name: "Дождаться готовности hotel-service"
+  uri:
+    url: http://localhost:8082/api/v1/hotels
+    status_code: 200
+  register: hotel_ready
+  until: hotel_ready.status == 200
+  retries: 15
+  delay: 3

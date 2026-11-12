@@ -1,0 +1,14 @@
+- name: "Обновление пакетов"
+  shell: apt update
+  
+- name: "Установка postgres"
+  shell: apt install -y postgresql
+
+- name: "Запуск postgres"
+  shell: systemctl start postgresql && systemctl enable postgresql
+
+- name: "Создание базы данных"
+  shell: |
+    su - postgres -c "psql -c \"CREATE DATABASE test_db;\""
+    su - postgres -c "psql -d test_db -c \"CREATE TABLE test_table (id SERIAL PRIMARY KEY, name VARCHAR(50), value VARCHAR(50));\""
+    su - postgres -c "psql -d test_db -c \"INSERT INTO test_table (name, value) VALUES ('Яблоки', '5'), ('Груши', '12'), ('Дыня', '10');\""

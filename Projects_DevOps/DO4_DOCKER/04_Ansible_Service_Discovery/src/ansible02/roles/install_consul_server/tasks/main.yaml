@@ -1,0 +1,46 @@
+- name: "Обновление пакетов"
+  shell: apt update
+
+- name: "Копировать Consul бинарник"                                                           
+  copy:                                                                                        
+    src: /home/vagrant/src/consul01/consul                                                    
+    dest: /usr/local/bin/consul                                                                
+    mode: 0755                                                                                 
+                                                                                                  
+- name: "Проверить версию"                                                                     
+  shell: consul --version
+
+- name: "Создаём папку для конфигов"                                                           
+  shell: mkdir -p /etc/consul.d
+
+- name: "Копируем consul_server.hcl"                                                                        
+  copy: 
+    src: /home/vagrant/src/consul01/consul_server.hcl
+    dest: /etc/consul.d/consul.hcl
+    owner: vagrant 
+    group: vagrant
+
+
+- name: "Создать systemd unit для Consul SERVER"                                                      
+  shell: |                                                                                     
+    cat > /etc/systemd/system/consul.service << 'EOF'                                          
+    [Unit]                                                                                     
+    Description=Consul Agent                                                                   
+    After=network.target                                                                       
+                                                                                              
+    [Service]                                                                                  
+    ExecStart=/usr/local/bin/consul agent -config-dir=/etc/consul.d/                           
+    ExecReload=/bin/kill -HUP $MAINPID                                                         
+    Restart=on-failure                                                                         
+    LimitNOFILE=65536                                                                          
+                                                                                              
+    [Install]                                                                                  
+    WantedBy=multi-user.target                                                                 
+    EOF                                                                 
+                                                                                                  
+- name: "Запуск consul сервис"                                                                         
+  systemd:                                                                                     
+    name: consul                                                                               
+    state: started                                                                             
+    enabled: yes                                                                               
+    daemon_reload: yes

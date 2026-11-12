@@ -1,0 +1,90 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+# Vagrantfile — универсальный (Linux → libvirt, Mac/Win → VirtualBox)
+# Part 3 — Docker Swarm кластер (3 машины)
+
+
+# Автоопределение ОС хоста 
+def os_windows?
+  RUBY_PLATFORM =~ /mingw|mswin/
+end
+
+def os_mac?
+  RUBY_PLATFORM =~ /darwin/
+end
+
+def os_linux?
+  RUBY_PLATFORM =~ /linux/
+end
+
+def arm_mac?
+  RUBY_PLATFORM =~ /arm64-darwin|aarch64-darwin/
+end
+
+# Выбираем провайдера в зависимости от ОС
+provider = if os_linux?
+             :libvirt
+           else
+             :virtualbox
+           end
+
+# Общие настройки ВМ 
+Vagrant.configure("2") do |config|
+  config.vm.box = if arm_mac? then "bento/ubuntu-22.04" else "generic/ubuntu2204" end
+  config.vm.box_version = "0"
+
+  # Настройки в зависимости от провайдера
+  if provider == :libvirt
+    config.vm.provider "libvirt" do |libvirt|
+      libvirt.memory = "1024"
+      libvirt.cpus = 1
+      libvirt.driver = "kvm"
+    end
+  else
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+  end
+
+  # Определение машин: имя, IP, список пробрасываемых портов
+
+  nodes = [
+    {
+      name: "manager",
+      ip:   "192.168.121.121",
+      ports: []
+    },
+    {
+      name: "node01",
+      ip:   "192.168.121.122",
+      ports: [
+        { guest: 8081, host: 8081 },
+        { guest: 8087, host: 8087 }
+      ]
+    },
+    {
+      name: "node02",
+      ip:   "192.168.121.123",
+      ports: []
+    }
+  ]
+
+  # Создаём все машины в цикле
+  nodes.each do |node|
+    config.vm.define node[:name] do |vm|
+      vm.vm.hostname = node[:name]
+      vm.vm.network "private_network", ip: node[:ip]
+
+      # Пробрасываем порты, если они заданы
+      node[:ports].each do |port|
+        vm.vm.network "forwarded_port",
+          guest: port[:guest],
+          host: port[:host],
+          protocol: "tcp"
+      end
+    end
+  end
+end

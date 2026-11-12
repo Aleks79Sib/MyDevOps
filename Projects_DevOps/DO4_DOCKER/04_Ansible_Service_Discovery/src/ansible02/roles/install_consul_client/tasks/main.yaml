@@ -1,0 +1,69 @@
+- name: "Обновление пакетов"                                                                   
+  shell: apt update                                                                            
+                                                                                                  
+- name: "Копировать Consul бинарник"                                                           
+  copy:                                                                                        
+    src: /home/vagrant/src/consul01/consul                                                     
+    dest: /usr/local/bin/consul                                                                
+    mode: 0755                                                                                 
+                                                                                                  
+- name: "Проверить версию"                                                                     
+  shell: consul --version                                                                      
+                                                                                              
+- name: "Проверить envoy version"                                                              
+  shell: envoy --version 2>&1 | grep -q '1.39.0'                                               
+  register: envoy_check                                                                        
+  ignore_errors: yes                                                                           
+                                                                                              
+- name: "Установить envoy"                                                                     
+  shell: |                                                                                     
+    wget -O /usr/local/bin/envoy https://github.com/envoyproxy/envoy/releases/download/v1.39.0/envoy-1.39.0-linux-x86_64          
+    chmod +x /usr/local/bin/envoy                                                              
+    envoy --version                                                                            
+  when: envoy_check.failed                                                                     
+                                                                                              
+- name: "Создать папку для конфигов"                                                           
+  shell: mkdir -p /etc/consul.d                                                                
+                                                                                              
+- name: "Копирует consul_client.hcl"                                                           
+  copy:                                                                                        
+    src: /home/vagrant/src/consul01/consul_client.hcl                                          
+    dest: /etc/consul.d/consul.hcl                                                             
+    owner: vagrant                                                                             
+    group: vagrant                                                                             
+                                                                                              
+- name: "Создать systemd unit для consul"
+  copy:
+    dest: /etc/systemd/system/consul.service
+    content: |
+      [Unit]
+      Description=Consul Agent
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      ExecStart=/usr/local/bin/consul agent -config-dir=/etc/consul.d/
+      Restart=on-failure
+      RestartSec=2
+      LimitNOFILE=65536
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: "Перечитать systemd"
+  shell: systemctl daemon-reload
+
+- name: "Запустить и включить consul"
+  systemd:
+    name: consul
+    state: restarted
+    enabled: yes
+
+- name: "Дождаться готовности Consul API"
+  uri:
+    url: http://localhost:8500/v1/status/leader
+    status_code: 200
+  register: consul_ready
+  until: consul_ready.status == 200
+  retries: 10
+  delay: 2

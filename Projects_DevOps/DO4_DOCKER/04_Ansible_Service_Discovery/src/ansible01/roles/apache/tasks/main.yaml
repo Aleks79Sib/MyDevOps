@@ -1,0 +1,8 @@
+- name: "Обновление пакетов"
+  shell: apt update
+  
+- name: "Установка apache2"                                                                        
+  shell: apt install -y apache2                                                                
+                                                                                                  
+- name: "Запуск apache2"                                                                         
+  shell: systemctl start apache2 && systemctl enable apache2

@@ -1,0 +1,38 @@
+- name: "Установка микросервисного приложения"
+  hosts: node01
+  become: yes
+
+  tasks:
+   - name: Update
+     shell: apt update
+
+   - name: "Установка докера"
+     shell: apt install -y docker.io
+  
+   - name: "Установка docker compose plugin (v2)"                                              
+     shell: apt install -y docker-compose-v2
+
+   - name: "Копирование файлов services"
+     copy:
+       src: /home/vagrant/src/services
+       dest: /home/vagrant/app/
+
+   - name: "Копирование файлов .env"
+     copy:
+       src: /home/vagrant/src/.env 
+       dest: /home/vagrant/app/.env 
+       owner: vagrant 
+       group: vagrant
+
+   - name: "Копирование файлов docker-compose"
+     copy:
+       src: /home/vagrant/src/docker-compose.yml
+       dest: /home/vagrant/app/docker-compose.yml
+       owner: vagrant 
+       group: vagrant
+
+   - name: "Сборка и деплой сервисов"
+     shell: cd /home/vagrant/app && docker compose up -d --build
+
+   - name: "Добавить vagrant в группу docker"                                                     
+     shell: usermod -aG docker vagrant

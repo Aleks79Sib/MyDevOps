@@ -1,0 +1,105 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+# Vagrantfile — универсальный (Linux → libvirt, Mac/Win → VirtualBox)
+# Part 2 (4 машины)
+
+
+# Автоопределение ОС хоста 
+def os_windows?
+  RUBY_PLATFORM =~ /mingw|mswin/
+end
+
+def os_mac?
+  RUBY_PLATFORM =~ /darwin/
+end
+
+def os_linux?
+  RUBY_PLATFORM =~ /linux/
+end
+
+def arm_mac?
+  RUBY_PLATFORM =~ /arm64-darwin|aarch64-darwin/
+end
+
+# Выбираем провайдера в зависимости от ОС
+provider = if os_linux?
+             :libvirt
+           else
+             :virtualbox
+           end
+
+# Общие настройки ВМ 
+Vagrant.configure("2") do |config|
+  config.vm.box = if arm_mac? then "bento/ubuntu-22.04" else "generic/ubuntu2204" end
+  config.vm.box_version = "0"
+
+  # Настройки в зависимости от провайдера
+  if provider == :libvirt
+    config.vm.provider "libvirt" do |libvirt|
+      libvirt.memory = "1024"
+      libvirt.cpus = 1
+      libvirt.driver = "kvm"
+    end
+  else
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+  end
+
+  nodes = [
+    {
+      name: "consul-server",
+      ip:   "192.168.121.200",
+      ports: []
+    },
+    {
+      name: "manager",
+      ip:   "192.168.121.201",
+      ports: [
+        { guest: 8500, host: 8500 }
+      ]
+    },
+    {
+      name: "api",
+      ip:   "192.168.121.202",
+      ports: [
+        { guest: 8082, host: 8082 }
+      ]
+    },
+    {
+      name: "db",
+      ip:   "192.168.121.203",
+      ports: [
+        { guest: 8082, host: 8082 }
+      ]
+    }
+
+  ]
+
+  # Создаём все машины в цикле
+  nodes.each do |node|
+    config.vm.define node[:name] do |vm|
+      vm.vm.hostname = node[:name]
+      vm.vm.network "private_network", ip: node[:ip]
+
+      # Пробрасываем порты, если они заданы
+      node[:ports].each do |port|
+        vm.vm.network "forwarded_port",
+          guest: port[:guest],
+          host: port[:host],
+          protocol: "tcp"
+      end
+
+      if node[:name] == "manager"
+      vm.vm.synced_folder "../consul01", "/home/vagrant/src/consul01", type: "rsync"
+      vm.vm.synced_folder "../services", "/home/vagrant/src/services", type: "rsync"
+      vm.vm.synced_folder "./roles", "/home/vagrant/src/ansible/roles", type: "rsync"
+      # путь "../consul01" укажите относительно места, где лежит Vagrantfile —
+      # поправьте под реальный путь вашей папки с consul/consul_client.hcl/consul_server.hcl
+      end
+    end
+  end
+end

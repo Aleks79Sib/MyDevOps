@@ -1,0 +1,13 @@
+- name: "Установка микросервисного приложения на node01"
+  hosts: node01
+  become: yes
+  roles:
+    - application
+
+- name: "Установка Apache и PostgreSQL на node02"
+  hosts: node02
+  become: yes
+  roles:
+    - apache
+    - postgres
+   
