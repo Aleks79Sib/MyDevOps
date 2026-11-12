@@ -10,7 +10,7 @@ free -h
 
 # Решение:
 # 1. Остановить редко используемые сервисы
-docker-compose stop [service_name]
+docker compose stop [service_name]
 
 # 2. Использовать AI-модель поменьше (3B вместо 7B)
 
@@ -56,17 +56,17 @@ sudo du -sh /* 2>/dev/null | sort -rh | head -10
 
 ```bash
 # 1. Проверить логи
-docker-compose logs [service_name]
+docker compose logs [service_name]
 
 # 2. Проверить порты (не заняты ли)
 sudo ss -tlnp | grep [PORT]
 
 # 3. Перезапустить сервис
-docker-compose restart [service_name]
+docker compose restart [service_name]
 
 # 4. Обновить образ
-docker-compose pull [service_name]
-docker-compose up -d [service_name]
+docker compose pull [service_name]
+docker compose up -d [service_name]
 
 # 5. Проверить, что контейнер запущен
 docker ps -a | grep [service_name]
@@ -191,7 +191,7 @@ chmod права (Unix):
                                                                                                    
  ```bash                                                                                           
    usermod -aG node agent_pi                                                                       
-   chmod 775 /workspace/projects/DO7_Docker_Compose_ID_1219717-1/src/                              
+   chmod 775 /workspace/projects/Docker_Compose/src/                              
  ```                                                                                               
                                                                                                    
  Тогда:                                                                                            
