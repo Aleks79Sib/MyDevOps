@@ -10,17 +10,16 @@ sudo apt install rclone -y
 
 # Проверить
 rclone --version
-# Ответ:
-# rclone v1.60.1-DEV
-# - os/version: ubuntu 24.04 (64 bit)
-# - os/kernel: 6.8.0-117-generic (x86_64)
-# - os/type: linux
-# - os/arch: amd64
-# - go/version: go1.22.2
-# - go/linking: dynamic
-# - go/tags: none
 ```
-
+> Ответ:
+> rclone v1.60.1-DEV
+> - os/version: ubuntu 24.04 (64 bit)
+> - os/kernel: 6.8.0-117-generic (x86_64)
+> - os/type: linux
+> - os/arch: amd64
+> - go/version: go1.22.2
+> - go/linking: dynamic
+> - go/tags: none
 ---
 
 ## 2. Настройка хранилища (Beget S3)
@@ -29,7 +28,7 @@ rclone --version
 rclone config
 
 # Далее
-2026/05/29 20:13:53 NOTICE: Config file "/home/lorydari/.config/rclone/rclone.conf" not found - using defaults
+2026/05/29 20:13:53 NOTICE: Config file "~/.config/rclone/rclone.conf" not found - using defaults
 No remotes found, make a new one?
 n) New remote
 s) Set configuration password
@@ -160,7 +159,7 @@ Options:
 - access_key_id: 9BXXXXXXXXXXX6
 - secret_access_key: ZZZZZZZZZZZZZZZZZZ
 - region: ru1
-- endpoint: https://5ad68715e105-intelligent-stream.s3.ru1.storage.beget.cloud
+- endpoint: https://5a-intelligent-stream.s3.ru1.storage.beget.cloud
 - acl: private
 Keep this "beget" remote?
 y) Yes this is OK (default)
@@ -232,7 +231,7 @@ sudo chmod -R 755 /storage/nextcloud/data
 ```bash
 sudo crontab -e
 
-no crontab for lorydari - using an empty one
+no crontab for username - using an empty one
 
 Select an editor.  To change later, run 'select-editor'.
   1. /bin/nano        <---- easiest
@@ -243,8 +242,8 @@ Select an editor.  To change later, run 'select-editor'.
 Choose 1-4 [1]: 1
 
 #  Добавляем строки 
-0 3 * * 1,3,5 /home/lorydari/scripts/daily_backup.sh >> /storage/backups/NewServer/logs/daily.log 2>&1
-0 3 * * 3 /home/lorydari/scripts/full_backup.sh >> /storage/backups/NewServer/logs/full.log 2>&1
+0 3 * * 1,3,5 ~/scripts/daily_backup.sh >> /storage/backups/NewServer/logs/daily.log 2>&1
+0 3 * * 3 ~/scripts/full_backup.sh >> /storage/backups/NewServer/logs/full.log 2>&1
 
 sudo crontab -l
 
@@ -267,8 +266,8 @@ sudo crontab -l
 сделай так: положи файлы в /usr/local/bin, 
 но не через копирование, а через символическую ссылку:
 ```bash
-sudo ln -s /home/lorydari/scripts/daily_backup.sh /usr/local/bin/daily_backup.sh
-sudo ln -s /home/lorydari/scripts/full_backup.sh /usr/local/bin/full_backup.sh
+sudo ln -s ~/scripts/daily_backup.sh /usr/local/bin/daily_backup.sh
+sudo ln -s ~/scripts/full_backup.sh /usr/local/bin/full_backup.sh
 ```
 - Финальный тест для cron:
 Выполни в терминале:
@@ -276,7 +275,7 @@ sudo ln -s /home/lorydari/scripts/full_backup.sh /usr/local/bin/full_backup.sh
 ```bash
 
 
-/home/lorydari/scripts/daily_backup.sh >> /storage/backups/NewServer/logs/daily.log 2>&1
+~/scripts/daily_backup.sh >> /storage/backups/NewServer/logs/daily.log 2>&1
 
 # Затем загляни в лог:
 
