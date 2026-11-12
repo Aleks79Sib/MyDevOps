@@ -25,7 +25,7 @@ PORT_CMD = case $$service in api-gateway) port=8080;; product-service) port=8081
 LOG_DIR = .logs
 
 # Detect docker compose command (v2 plugin vs standalone)
-DOCKER_COMPOSE := $(shell command -v docker-compose 2>/dev/null || echo "docker compose")
+DOCKER_COMPOSE := $(shell command -v docker compose 2>/dev/null || echo "docker compose")
 
 # ========================
 # Full project targets

@@ -415,7 +415,7 @@ docker compose build
 
 Изменили Dockerfile всех 9 сервисов: теперь сборка выполняется из корня Maven-проекта с использованием общего reactor.
 Использовали multi-stage Docker build: JDK для сборки → JRE для запуска.
-В docker-compose.yml настроили единый корневой build context для всех сервисов.
+В docker compose.yml настроили единый корневой build context для всех сервисов.
 Зафиксировали версии инфраструктурных образов MongoDB, Redis, Elasticsearch вместо latest.
 
 Добавили .dockerignore.
@@ -478,28 +478,28 @@ docker tag shopsphere-frontend:test frontend:test
 - Перетаргетируем
 
 ```bash
-docker tag frontend:test htclelik/frontend:test
-docker tag api-gateway:test htclelik/api-gateway:test
-docker tag product-service:test htclelik/product-service:test
-docker tag order-service:test htclelik/order-service:test
-docker tag user-service:test htclelik/user-service:test
-docker tag cart-service:test htclelik/cart-service:test
-docker tag payment-service:test htclelik/payment-service:test
-docker tag shipping-service:test htclelik/shipping-service:test
-docker tag notification-service:test htclelik/notification-service:test
-docker tag review-service:test htclelik/review-service:test
+docker tag frontend:test username/frontend:test
+docker tag api-gateway:test username/api-gateway:test
+docker tag product-service:test username/product-service:test
+docker tag order-service:test username/order-service:test
+docker tag user-service:test username/user-service:test
+docker tag cart-service:test username/cart-service:test
+docker tag payment-service:test username/payment-service:test
+docker tag shipping-service:test username/shipping-service:test
+docker tag notification-service:test username/notification-service:test
+docker tag review-service:test username/review-service:test
 
 # Запушим
-docker push htclelik/frontend:test
-docker push htclelik/api-gateway:test
-docker push htclelik/product-service:test
-docker push htclelik/order-service:test
-docker push htclelik/user-service:test
-docker push htclelik/cart-service:test
-docker push htclelik/payment-service:test
-docker push htclelik/shipping-service:test
-docker push htclelik/notification-service:test
-docker push htclelik/review-service:test
+docker push username/frontend:test
+docker push username/api-gateway:test
+docker push username/product-service:test
+docker push username/order-service:test
+docker push username/user-service:test
+docker push username/cart-service:test
+docker push username/payment-service:test
+docker push username/shipping-service:test
+docker push username/notification-service:test
+docker push username/review-service:test
 ```
 
 ## 3. Если необходимо, написать модульные тесты для микросервисов с бизнес-логикой приложения.
@@ -759,7 +759,7 @@ pod/shopsphere-test-connection created (server dry run)
 ```bash
 helm upgrade --install shopsphere ./helm-shopsphere \
   -n shopsphere \
-  --set global.image.registry=htclelik \
+  --set global.image.registry=username \
   --set global.image.tag=test
 ```
 
@@ -966,7 +966,7 @@ shipping-service-84b9658d55-9klrf       1/1     Running   0          18m     10.
 shipping-service-84b9658d55-jh9hp       1/1     Running   0          19m     10.42.0.15   shop-master    <none>           <none>
 user-service-fffb57fbb-cjkmf            1/1     Running   0          19m     10.42.1.16   shop-worker1   <none>           <none>
 user-service-fffb57fbb-vhwll            1/1     Running   0          18m     10.42.1.17   shop-worker1   <none>           <none>
-lorydari@homeserver:/data/workspace/projects/DO14/Devops-project$ 
+username@homeserver:/data/workspace/projects/DO14/Devops-project$ 
 ```
 
 ```bash
