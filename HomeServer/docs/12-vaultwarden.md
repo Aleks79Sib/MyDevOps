@@ -32,7 +32,7 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO vaultwarden;
 
 ```yaml
 - hostname: vaultwarden.YOUR_DOMAIN.com
-  service: http://127.0.0.1:49080
+  service: http://127.0.0.1:8080
   originRequest:
     httpHostHeader: vaultwarden.YOUR_DOMAIN.com
 ```
@@ -65,7 +65,7 @@ vaultwarden:
   depends_on:
     - postgres
   ports:
-    - "127.0.0.1:49080:8080"
+    - "127.0.0.1:8080:8080"
 ```
 
 Добавить в `.env`:
