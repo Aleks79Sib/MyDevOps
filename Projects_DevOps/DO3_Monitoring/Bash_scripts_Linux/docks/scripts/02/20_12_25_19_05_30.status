@@ -1,6 +1,6 @@
 HOSTNAME = ws1
 TIMEZONE = Europe/Moscow UTC +3
-USER = lorydari
+USER = username
 OS = Ubuntu 20.04.6 LTS
 DATE = 20 December 2025 19:05:26
 UPTIME = up 1 day, 15 hours, 47 minutes

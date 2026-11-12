@@ -55,7 +55,7 @@ random_dir() {
         -prune 2>/dev/null | shuf -n 1
 }
 
-#TARGET_PATH="/home/lorydari/Projects/TESTs/FOLDER"
+#TARGET_PATH="~/Projects/TESTs/FOLDER"
 TARGET_PATH="$random_dir"
 
 # Функция для генерации названий папок

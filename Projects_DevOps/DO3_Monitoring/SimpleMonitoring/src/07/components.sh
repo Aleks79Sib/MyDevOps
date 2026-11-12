@@ -10,9 +10,9 @@ setup_prometheus_stack() {
     # Переходим в директорию
     cd /opt/prometheus_stack
     
-    # Создаем docker-compose.yml
-    echo "Создаем docker-compose.yml..."
-    cat << 'EOF' | sudo tee /opt/prometheus_stack/docker-compose.yml > /dev/null
+    # Создаем docker compose.yml
+    echo "Создаем docker compose.yml..."
+    cat << 'EOF' | sudo tee /opt/prometheus_stack/docker compose.yml > /dev/null
 
 services:
 

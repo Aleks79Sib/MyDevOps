@@ -1,7 +1,7 @@
 #version: "3.8"
 
 # ============================================================
-# docker-compose.yml для микросервисного приложения
+# docker compose.yml для микросервисного приложения
 # Бронирование отелей — 7 Java-сервисов + |PostgreSQL + RabbitMQ
 # ============================================================
 
@@ -43,7 +43,7 @@ services:
   # ---------- Session Service (простые — только БД) ----------
   session-service:
     build: ./services/session-service
-    image: htclelik/session-service:v2.do9-1-metrics
+    image: username/session-service:v2.do9-1-metrics
     container_name: session-service
     restart: unless-stopped
     ports:
@@ -61,7 +61,7 @@ services:
   # ---------- Hotel Service (простые — только БД) ----------
   hotel-service:
     build: ./services/hotel-service
-    image: htclelik/hotel-service:v2.do9-1-metrics
+    image: username/hotel-service:v2.do9-1-metrics
     container_name: hotel-service
     restart: unless-stopped
     environment:
@@ -77,7 +77,7 @@ services:
   # ---------- Payment Service (простые — только БД) ----------
   payment-service:
     build: ./services/payment-service
-    image: htclelik/payment-service:v2.do9-1-metrics
+    image: username/payment-service:v2.do9-1-metrics
     container_name: payment-service
     restart: unless-stopped
     environment:
@@ -93,7 +93,7 @@ services:
   # ---------- Loyalty Service (простые — только БД) ----------
   loyalty-service:
     build: ./services/loyalty-service
-    image: htclelik/loyalty-service:v2.do9-1-metrics
+    image: username/loyalty-service:v2.do9-1-metrics
     container_name: loyalty-service
     restart: unless-stopped
     environment:
@@ -109,7 +109,7 @@ services:
   # ---------- Report Service (БД + RabbitMQ) ----------
   report-service:
     build: ./services/report-service
-    image: htclelik/report-service:v2.do9-1-metrics
+    image: username/report-service:v2.do9-1-metrics
     container_name: report-service
     restart: unless-stopped
     environment:
@@ -133,7 +133,7 @@ services:
   # ---------- Booking Service (БД + RabbitMQ + HTTP-сервисы) ----------
   booking-service:
     build: ./services/booking-service
-    image: htclelik/booking-service:v2.do9-1-metrics
+    image: username/booking-service:v2.do9-1-metrics
     container_name: booking-service
     restart: unless-stopped
     environment:
@@ -169,7 +169,7 @@ services:
   # ---------- Gateway Service (шлюз — без БД, HTTP-клиент) ----------
   gateway-service:
     build: ./services/gateway-service
-    image: htclelik/gateway-service:v2.do9-1-metrics
+    image: username/gateway-service:v2.do9-1-metrics
     container_name: gateway-service
     restart: unless-stopped
     ports:

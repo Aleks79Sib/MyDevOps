@@ -8,7 +8,7 @@ validate_argument_count "$@"
 
 # Извлечение параметров
 TARGET_PATH="$1"
-# /home/lorydari/Projects/TESTs
+# ~/Projects/TESTs
 
 NUM_FOLDERS="$2"
 FOLDERS="папок"

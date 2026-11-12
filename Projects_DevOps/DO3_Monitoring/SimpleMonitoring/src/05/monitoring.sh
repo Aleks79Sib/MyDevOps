@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOG_PATH="/home/lorydari/Projects/DO4_LinuxMonitoring_v2.0.ID_356280-1/src/04"
+LOG_PATH="~/Projects/DO4_LinuxMonitoring_v2.0.ID_356280-1/src/04"
 
 get_all_files_log() {
     local log_path="$1"

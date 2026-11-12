@@ -712,7 +712,7 @@ subnet 10.20.0.0 netmask 255.255.255.192
 
 - Воспользуемся *Local TCP forwarding* с ws21 до ws22, чтобы получить доступ к веб-серверу на ws22 с ws21. 
 
-  - на ws21 командой `ssh -L 8080:localhost:80 -p 2022 lorydari@10.20.0.20`
+  - на ws21 командой `ssh -L 8080:localhost:80 -p 2022 username@10.20.0.20`
 
   ![Report ws21](./docs/images/8_3_2025-11-02%20_11.35.20.png)
 
@@ -727,7 +727,7 @@ subnet 10.20.0.0 netmask 255.255.255.192
 
 ![report ssh](./docs/images/8_4_2_VirtualBox_ws22_02_11_2025_13_19_32.png)
 
-  - на ws22 Воспользуемся командой `ssh -R 9090:localhost:80 lorydari@10.10.0.2 -p 2022`
+  - на ws22 Воспользуемся командой `ssh -R 9090:localhost:80 username@10.10.0.2 -p 2022`
   
   ![Report ws22](./docs/images/8_4_3_R_VirtualBox_ws22_02_11_2025_13_21_52.png)
 

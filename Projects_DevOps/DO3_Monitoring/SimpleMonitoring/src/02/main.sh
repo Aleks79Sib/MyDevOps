@@ -8,7 +8,7 @@ FILE_CHARS="$2"
 FILE_SIZE="$3"
 
 # Создаем лог-файл
-LOG_PATH="/home/lorydari/Projects/DO4_LinuxMonitoring_v2.0.ID_356280-1/src/02"
+LOG_PATH="~/Projects/DO4_LinuxMonitoring_v2.0.ID_356280-1/src/02"
 LOG_FILE=$(create_log_file "$LOG_PATH")
 
 # Запоминаем время начала

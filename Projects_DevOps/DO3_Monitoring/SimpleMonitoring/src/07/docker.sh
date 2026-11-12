@@ -5,11 +5,11 @@ install_docker_compose_v1() {
     sudo apt update
     sudo apt install docker.io -y
     sudo apt install curl -y
-    COMVER=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep 'tag_name' | cut -d\" -f4) && sudo curl -L "https://github.com/docker/compose/releases/download/$COMVER/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
-    sudo chmod +x /usr/bin/docker-compose
+    COMVER=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep 'tag_name' | cut -d\" -f4) && sudo curl -L "https://github.com/docker/compose/releases/download/$COMVER/docker compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker compose
+    sudo chmod +x /usr/bin/docker compose
     echo ""
-    echo "Установка Docker + Docker-compose завершена"
-    docker-compose --version
+    echo "Установка Docker + docker compose завершена"
+    docker compose --version
 }
 
 
@@ -17,7 +17,7 @@ install_docker_compose() {
     echo "=== Установка Docker Engine + Docker Compose V2 ==="
 
     # Удаляем старые пакеты версий Docker, если они установлены
-    sudo apt remove -y docker.io docker-doc docker-compose podman-docker containerd runc
+    sudo apt remove -y docker.io docker-doc docker compose podman-docker containerd runc
 
     # Зависимости
     sudo apt update
@@ -44,7 +44,7 @@ install_docker_compose() {
         docker-ce-cli \
         containerd.io \
         docker-buildx-plugin \
-        docker-compose-plugin
+        docker compose-plugin
 
     echo ""
     echo "=== Установка завершена ==="
@@ -82,7 +82,7 @@ END
 
 
     cd /opt/prometheus_stack
-    sudo docker-compose up -d
+    sudo docker compose up -d
     
     echo "Статус запущенных контейнеров:"
     sudo docker ps

@@ -70,19 +70,19 @@
 - команды для создания пользователя
 
 ```bash
-sudo adduser reddog
+sudo adduser username
 ``` 
-где `reddog` - имя пользователя
+где `username` - имя пользователя
 
 - добавление пользователя в adm группу
 
 ```bash
-sudo usermod -aG adm reddog
+sudo usermod -aG adm username
 ```
 
-![Добавление нового пользователя reddog](../DO1_Basic_Linux/docs/screenshots/basic_commands/2_1_ADD_User_Command_VirtualBox_Ubuntu2004server_23_10_2025_11_53_52.png)
+![Добавление нового пользователя username](../DO1_Basic_Linux/docs/screenshots/basic_commands/2_1_ADD_User_Command_VirtualBox_Ubuntu2004server_23_10_2025_11_53_52.png)
 
-- Новый пользователь *reddog* в выводе команды
+- Новый пользователь *username* в выводе команды
 
 ```bash
 cat /etc/passwd
@@ -216,18 +216,18 @@ sudo reboot
 
 ### 2.5. Использование команды **sudo**
 
-- Разрешили пользователю *reddog*, созданному в [2.2](#22-создание-пользователя), выполнять команду sudo - добавили пользователя в группу *sudo*.
+- Разрешили пользователю *username*, созданному в [2.2](#22-создание-пользователя), выполнять команду sudo - добавили пользователя в группу *sudo*.
 
 ```bash
-sudo usermod -aG sudo reddog
+sudo usermod -aG sudo username
 ```
-- После добавления в группу sudo нужно выйти и зайти под пользователем *reddog*.
+- После добавления в группу sudo нужно выйти и зайти под пользователем *username*.
 
-![Пользователь reddog в группе sudo](../DO1_Basic_Linux/docs/screenshots/basic_commands/5_1_sudo_VirtualBox_Ubuntu2004server_23_10_2025_15_01_41.png)
+![Пользователь username в группе sudo](../DO1_Basic_Linux/docs/screenshots/basic_commands/5_1_sudo_VirtualBox_Ubuntu2004server_23_10_2025_15_01_41.png)
 
 - *Истинное* назначение команды *sudo* (superuser do) - это команда, которая позволяет временно выполнять команды с правами суперпользователя *root*.
 
-- Поменяли hostname ОС *user-1* от имени пользователя *reddog*, созданного в пункте [2.2](#22-создание-пользователя)(используя *sudo*) на *User-2*.
+- Поменяли hostname ОС *user-1* от имени пользователя *username*, созданного в пункте [2.2](#22-создание-пользователя)(используя *sudo*) на *User-2*.
 
 ```bash
 sudo hostnamectl set-hostname User-2
@@ -291,7 +291,7 @@ which nano vim mcedit
 vim test_vim.txt #- Создали файл и произвели действия в VIM:
 ```
 - 1 Нажали `i` (режим вставки)
-- 2 Написали: `lorydari`
+- 2 Написали: `username`
 - 3 Нажали `Esc` (выход из режима вставки)
 - 4 Ввели: `:wq` и нажали `Enter` (сохранить и выйти)
 
@@ -300,7 +300,7 @@ vim test_vim.txt #- Создали файл и произвели действи
 ```bash
 nano test_nano.txt` #- Создали файл и произвели действия в Nano:
 ```
-- 1 Написали: `lorydari`
+- 1 Написали: `username`
 - 2 Нажали `Ctrl + O` (режим WriteOut - сохранить)
 - 3 Нажали `Enter` (подтвердить имя файла)
 - 4 Нажали `Ctrl + X` (выйти)
@@ -311,7 +311,7 @@ nano test_nano.txt` #- Создали файл и произвели дейст�
 mcedit test_mcedit.txt
 ```
 
-- 1 Написали: `lorydari`
+- 1 Написали: `username`
 - 2 Нажали `F2` (save - сохранить)
 - 3 Нажали `F10`(выйти)
 
@@ -341,14 +341,14 @@ mcedit test_mcedit.txt
 
 ![Действия в MCEDIT](../DO1_Basic_Linux/docs/screenshots/basic_commands/7_3_mc_VirtualBox_Ubuntu2004server_23_10_2025_16_46_29.png)
 
-- Используя каждый из трех выбранных редакторов, отредактировали файл ещё раз вместо `lorydari` записали `21 School 21` \
-- Затем освоили функции поиска по содержимому файла (слово) и замены слова `21 School 21` на `reddog`.
+- Используя каждый из трех выбранных редакторов, отредактировали файл ещё раз вместо `username` записали `21 School 21` \
+- Затем освоили функции поиска по содержимому файла (слово) и замены слова `21 School 21` на `username`.
 - `vim test_vim.txt` - Открыли файл и произвели действия в VIM:
 - 1 В режиме команд написали: `:%s/21 School 21/`
 
 ![Поиск слова в VIM](../DO1_Basic_Linux/docs/screenshots/basic_commands/7_4_1_vim_VirtualBox_Ubuntu2004server_23_10_2025_19_20_41.png)
 
-- 2 Для вставки дополнили: `:%s/21 School 21/reddog/g`
+- 2 Для вставки дополнили: `:%s/21 School 21/username/g`
 
 ![Вставка слова в VIM](../DO1_Basic_Linux/docs/screenshots/basic_commands/7_4_2_vim_VirtualBox_Ubuntu2004server_23_10_2025_19_22_10.png)
 
@@ -361,7 +361,7 @@ mcedit test_mcedit.txt
 ![Поиск слова в Nano](../DO1_Basic_Linux/docs/screenshots/basic_commands/7_4_1_nano_VirtualBox_Ubuntu2004server_23_10_2025_19_31_04.png)
 
 - 3 Нажали `Ctrl + \` (замена)
-- 4 Написали: `reddog`
+- 4 Написали: `username`
 - 5 Нажали `Ctrl + O` (режим WriteOut - сохранить)
 - 6 Нажали `Enter` (подтвердить имя файла)
 - 7 Нажали `Ctrl + X` (выйти)
@@ -375,7 +375,7 @@ mcedit test_mcedit.txt
 ![Действия в MCEDIT](../DO1_Basic_Linux/docs/screenshots/basic_commands/7_4_1_mc_VirtualBox_Ubuntu2004server_23_10_2025_19_38_56.png)
 
 - 3 Нажали `F4` (замена)
-- 4 Написали: `reddog`
+- 4 Написали: `username`
 - 5 Нажали `F2` (save - сохранить)
 - 6 Нажали `F10`(выйти)
 
@@ -683,7 +683,7 @@ sudo systemctl status cron
 - Найди в системных журналах строчки (минимум две в заданном временном диапазоне) о выполнении.
 
 ```bash
-cat /home/lorydari/uptime.log
+cat ~/uptime.log
 ```
 
 ![Report](../DO1_Basic_Linux/docs/screenshots/basic_commands/15_3_Task_VirtualBox_Ubuntu2004server_25_10_2025_19_03_20.png)

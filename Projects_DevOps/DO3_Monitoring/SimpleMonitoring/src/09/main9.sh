@@ -9,7 +9,7 @@ TEMP_METRICS="$webdir/index.html.tmp"
 
 # Создаем директорию, если не существует
 mkdir -p $webdir
-chown -R lorydari:lorydari /var/www/html/metrics
+chown -R username:username /var/www/html/metrics
 chmod 755 /var/www/html/metrics
 function main {
     while true; do

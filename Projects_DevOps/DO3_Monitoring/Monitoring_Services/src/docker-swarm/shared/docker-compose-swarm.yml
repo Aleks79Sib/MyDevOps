@@ -27,7 +27,7 @@ services:
       - app-network                                                                             
                                                                                                 
   session-service:                                                                              
-    image: htclelik/session-service:v2.do9-1-metrics                                                     
+    image: username/session-service:v2.do9-1-metrics                                                     
     restart: unless-stopped                                                                     
     ports:                                                                                      
       # - "${SESSION_SERVICE_PORT}:8081"
@@ -44,7 +44,7 @@ services:
       - app-network                                                                             
                                                                                                 
   hotel-service:                                                                                
-    image: htclelik/hotel-service:v2.do9-1-metrics                                                       
+    image: username/hotel-service:v2.do9-1-metrics                                                       
     restart: unless-stopped                                                                     
     environment:                                                                                
       POSTGRES_HOST: postgres_s21                                                                   
@@ -58,7 +58,7 @@ services:
       - app-network                                                                             
                                                                                                 
   payment-service:                                                                              
-    image: htclelik/payment-service:v2.do9-1-metrics                                                     
+    image: username/payment-service:v2.do9-1-metrics                                                     
     restart: unless-stopped                                                                     
     environment:                                                                                
       POSTGRES_HOST: postgres_s21                                                                   
@@ -72,7 +72,7 @@ services:
       - app-network                                                                             
                                                                                                 
   loyalty-service:                                                                              
-    image: htclelik/loyalty-service:v2.do9-1-metrics                                                     
+    image: username/loyalty-service:v2.do9-1-metrics                                                     
     restart: unless-stopped                                                                     
     environment:                                                                                
       POSTGRES_HOST: postgres_s21                                                                   
@@ -86,7 +86,7 @@ services:
       - app-network                                                                             
                                                                                                 
   report-service:                                                                               
-    image: htclelik/report-service:v2.do9-1-metrics                                                      
+    image: username/report-service:v2.do9-1-metrics                                                      
     restart: unless-stopped                                                                     
     environment:                                                                                
       POSTGRES_HOST: postgres_s21                                                                   
@@ -106,7 +106,7 @@ services:
       - app-network                                                                             
                                                                                                 
   booking-service:                                                                              
-    image: htclelik/booking-service:v2.do9-1-metrics                                                     
+    image: username/booking-service:v2.do9-1-metrics                                                     
     restart: unless-stopped                                                                     
     environment:                                                                                
       POSTGRES_HOST: postgres_s21                                                                   
@@ -132,7 +132,7 @@ services:
       - app-network                                                                             
                                                                                                 
   gateway-service:                                                                              
-    image: htclelik/gateway-service:v2.do9-1-metrics                                                     
+    image: username/gateway-service:v2.do9-1-metrics                                                     
     restart: unless-stopped                                                                     
     ports:                                                                                      
       # - "${GATEWAY_SERVICE_PORT}:8087"                                                                                      

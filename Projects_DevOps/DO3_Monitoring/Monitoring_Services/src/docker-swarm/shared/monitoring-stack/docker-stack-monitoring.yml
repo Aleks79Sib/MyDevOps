@@ -106,7 +106,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     environment:
-      GF_SECURITY_ADMIN_USER: htclelik@gmail.com
+      GF_SECURITY_ADMIN_USER: username@gmail.com
       GF_SECURITY_ADMIN_PASSWORD: admin        # ← смените после первого входа
       GF_USERS_ALLOW_SIGN_UP: "false"
     configs:

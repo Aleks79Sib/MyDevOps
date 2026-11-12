@@ -8,7 +8,7 @@
 
 ### 1.1 Использовать Docker Swarm из первого проекта
 
-- Скопировали файлы из проекта DO5/SimpleDocker - Dockerfiles и docker-compose.yml и добавили новый image:do9-1-metrics
+- Скопировали файлы из проекта DO5/SimpleDocker - Dockerfiles и docker compose.yml и добавили новый image:do9-1-metrics
 
 ### 1.2. Интеграция Micrometer в приложение
 
@@ -54,7 +54,7 @@
 
 ![docker images](./screenshots/part1/docker_swarm/hub_docker.png)
 
-- Обновили `docker-compose-swarm.yml` скрипты запуска и инициализации и `Vagrantfile`
+- Обновили `docker compose-swarm.yml` скрипты запуска и инициализации и `Vagrantfile`
 - Подняли виртуальные машины 
 - Зашли в `vagrant ssh master-do9` и проверили сервисы
 
@@ -80,9 +80,9 @@ curl http://<host>:<порт-сервиса>/actuator/prometheus
 vagrant@worker-do9-2:~$ docker ps
 CONTAINER ID   IMAGE                                       COMMAND                  CREATED        STATUS        PORTS      NAMES
 b166e5189769   portainer/agent:2.19.5                      "./agent"                26 hours ago   Up 26 hours              portainer_agent.qv7jgbv27eubf0hqexr8b0ah9.j756pr5kl763e97foo46movz4
-4d0eaf9a9628   htclelik/booking-service:v2.do9-1-metrics   "/__cacert_entrypoin…"   26 hours ago   Up 26 hours   8083/tcp   s21_booking-service.1.r0xtn1gd172729tda8snxqdaf
-40ddf943d035   htclelik/report-service:v2.do9-1-metrics    "/__cacert_entrypoin…"   26 hours ago   Up 26 hours   8086/tcp   s21_report-service.1.p32s7h09x4bclhaem5eztb3w0
-d4db2d86c11b   htclelik/payment-service:v2.do9-1-metrics   "/__cacert_entrypoin…"   26 hours ago   Up 26 hours   8084/tcp   s21_payment-service.1.5wb8a8xi58s9xclg5yj6yx2f6
+4d0eaf9a9628   username/booking-service:v2.do9-1-metrics   "/__cacert_entrypoin…"   26 hours ago   Up 26 hours   8083/tcp   s21_booking-service.1.r0xtn1gd172729tda8snxqdaf
+40ddf943d035   username/report-service:v2.do9-1-metrics    "/__cacert_entrypoin…"   26 hours ago   Up 26 hours   8086/tcp   s21_report-service.1.p32s7h09x4bclhaem5eztb3w0
+d4db2d86c11b   username/payment-service:v2.do9-1-metrics   "/__cacert_entrypoin…"   26 hours ago   Up 26 hours   8084/tcp   s21_payment-service.1.5wb8a8xi58s9xclg5yj6yx2f6
 ```
 
 `docker exec -it 4d0eaf9a9628 sh -c "wget -qO- http://localhost:8083/actuator/prometheus"`

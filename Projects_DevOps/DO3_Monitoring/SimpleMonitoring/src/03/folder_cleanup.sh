@@ -6,7 +6,7 @@ HEADER='\033[0m'
 VALUE='\033[0;32m'
 RESET='\033[0m'
 
-LOG_PATH="/home/lorydari/Projects/DO4_LinuxMonitoring_v2.0.ID_356280-1/src/02/log_file.log"
+LOG_PATH="~/Projects/DO4_LinuxMonitoring_v2.0.ID_356280-1/src/02/log_file.log"
 
 # Провекра места на диске 
 check_disk_space() {
