@@ -655,9 +655,9 @@ deploy_job:
 - `notify_ci_failure` — срабатывает при ошибке CI (on_failure)
 - Уведомление о деплое — в `after_script` внутри deploy_job
 
-[Телеграм бот: lorydari DO6 CI/CD](https://t.me/lorydari_do6_ci_cd_bot)
+[Телеграм бот: username DO6 CI/CD](https://t.me/username_do6_ci_cd_bot)
 
-![Бот lorydari DO6 CI/CD](../docs/screenshots/bot_telegramm.png)
+![Бот username DO6 CI/CD](../docs/screenshots/bot_telegramm.png)
 
 ![Чат с уведомлениями](../docs/screenshots/chat_bot_telegram.png)
 

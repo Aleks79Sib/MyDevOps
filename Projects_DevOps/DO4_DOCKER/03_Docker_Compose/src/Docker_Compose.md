@@ -61,7 +61,7 @@
 
 
 
-Docker Compose автоматически подхватывает переменные из `.env`, если он лежит в той же папке, что и `docker-compose.yml`.
+Docker Compose автоматически подхватывает переменные из `.env`, если он лежит в той же папке, что и `docker compose.yml`.
 
 **Важно:** Пользователь RabbitMQ `guest` по умолчанию может подключаться **только с localhost**. Для подключения из Docker-контейнеров нужно создать своего пользователя через переменные `RABBITMQ_DEFAULT_USER` и `RABBITMQ_DEFAULT_PASS` в определении сервиса rabbitmq.
 
@@ -77,7 +77,7 @@ Docker Compose автоматически подхватывает переме�
 2. **Таблицы внутри БД** создаются автоматически самими Spring-сервисами через Hibernate (настройка `spring.jpa.hibernate.ddl-auto=create`)
 3. **Начальные данные** (тестовые отели, пользователи) тоже заполняются сервисами через `InitializeData.java` и `data.sql`
 
-**В docker-compose.yml** мы смонтируем `init.sql` в специальную папку PostgreSQL:
+**В docker compose.yml** мы смонтируем `init.sql` в специальную папку PostgreSQL:
 ```yaml
 volumes:
   - ./services/database/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -173,7 +173,7 @@ RUN chmod +x /usr/local/bin/wait-for-it.sh
 ```dockerfile
 EXPOSE 8081
 ```
-- Информационная инструкция (не открывает порт — это делает `ports` в docker-compose.yml)
+- Информационная инструкция (не открывает порт — это делает `ports` в docker compose.yml)
 
 **Шаг 12 — команда запуска:**
 ```dockerfile
@@ -220,15 +220,15 @@ CMD ["wait-for-it.sh", "-t", "60", "$POSTGRES_HOST:$POSTGRES_PORT", "--", "java"
 
 - [x] **Создан файл `.env`** (`src/.env`)  — общие переменные окружения
 
-#### 1.2 Написание docker-compose.yml
+#### 1.2 Написание docker compose.yml
 
-**Файл:**  [docker-compose.yml](./docker-compose.yml)
+**Файл:**  [docker compose.yml](./docker compose.yml)
 
 Docker Compose — это инструмент для описания и запуска многоконтейнерных приложений. В одном файле мы описываем все сервисы (контейнеры), их взаимосвязи, порты, переменные окружения и volumes.
 
 ---
 
-##### Общая структура docker-compose.yml
+##### Общая структура docker compose.yml
 
 ```yaml
 version: "3.8"                # версия формата Docker Compose
@@ -441,7 +441,7 @@ gateway-service:
 
 **Файл:** `src/.env`
 
-Docker Compose автоматически подгружает переменные из `.env`, если он лежит рядом с `docker-compose.yml`. Все `${ИМЯ_ПЕРЕМЕННОЙ}` в docker-compose.yml берутся отсюда:
+Docker Compose автоматически подгружает переменные из `.env`, если он лежит рядом с `docker compose.yml`. Все `${ИМЯ_ПЕРЕМЕННОЙ}` в docker compose.yml берутся отсюда:
 
 | Переменная | Значение | Описание |
 |-----------|----------|----------|
@@ -461,15 +461,15 @@ Docker Compose автоматически подгружает переменн�
 
 **Преимущества `.env`:**
 - Не дублируем одинаковые значения (пароли, порты)
-- Можно менять настройки без правки docker-compose.yml
+- Можно менять настройки без правки docker compose.yml
 - Безопасность: `.env` можно добавить в `.gitignore`
 
 #### 1.3 Сборка и запуск
 
-- [x] `docker-compose build` — выполнено (41.5 сек) 
-- [x] `docker-compose up -d` — выполнено 
-- [x] `docker-compose ps` — все 9 контейнеров запущены 
-- [x] `docker-compose logs` — ошибки исправлены 
+- [x] `docker compose build` — выполнено (41.5 сек) 
+- [x] `docker compose up -d` — выполнено 
+- [x] `docker compose ps` — все 9 контейнеров запущены 
+- [x] `docker compose logs` — ошибки исправлены 
 
 ##### Ошибки при сборке и их исправление
 
@@ -480,7 +480,7 @@ Docker Compose автоматически подгружает переменн�
 | 3 | `env: 'bash': No such file or directory` | Alpine без `bash`, а `wait-for-it.sh` требует bash | Добавлен `RUN apk add --no-cache bash` |
 | 4 | `FATAL: role "postgres" does not exist` | Пользователь БД не совпадает с `OWNER` в init.sql | Согласован пользователь в .env и init.sql |
 | 5 | `AuthenticationFailureException: ACCESS_REFUSED` | `guest` в RabbitMQ подключается только с localhost | Создан кастомный пользователь через `RABBITMQ_DEFAULT_USER/PASS` |
-| 6 | `Access to DialectResolutionInfo cannot be null` | БД `reservations_db`, `statistics_db` не созданы (init.sql не выполнился из-за volume) | Сброшен volume и перезапущен `docker-compose up -d` |
+| 6 | `Access to DialectResolutionInfo cannot be null` | БД `reservations_db`, `statistics_db` не созданы (init.sql не выполнился из-за volume) | Сброшен volume и перезапущен `docker compose up -d` |
 
 ##### Итоговый статус контейнеров
 
@@ -653,7 +653,7 @@ vagrant up --provider=libvirt
 
 **На Mac:**
 ```bash
-cd /Users/leik.van-23/ProjectsVSC/02_DO_Devops/DO7_Docker_Compose_ID_1219717-1
+cd ~/ProjectsVSC/02_DO_Devops/DO7_Docker_Compose_ID_1219717-1
 vagrant up          # запуск VM (~5 мин в первый раз)
 ```
 ![vagrant up ](../docs/screenshots/up_vagrant_1.png)
@@ -665,7 +665,7 @@ vagrant up          # запуск VM (~5 мин в первый раз)
 ```bash
 vagrant ssh
 vagrant@docker-host:~$ ls /home/vagrant/src/
-docker-compose.yml  .env  REPORT.md  services/
+docker compose.yml  .env  REPORT.md  services/
 
 vagrant@docker-host:~$ docker --version
 Docker version 27.x.x
@@ -686,8 +686,8 @@ vagrant destroy -f  # уничтожить VM
 - [x] Модифицировать Vagrantfile для 3 машин (manager01, worker01, worker02)
 - [x] Написать shell-скрипты установки Docker и инициализации Swarm
 - [x] Загрузить образы на Docker Hub
-- [x] Модифицировать docker-compose.yml для подгрузки образов с Docker Hub
-- [x] Поднять VM и перенести docker-compose.yml на manager
+- [x] Модифицировать docker compose.yml для подгрузки образов с Docker Hub
+- [x] Поднять VM и перенести docker compose.yml на manager
 - [x] Запустить стек сервисов (`docker stack deploy`)
 - [x] Настроить nginx proxy для доступа к gateway и session service
 - [x] Скрыть прямой доступ к gateway и session service
@@ -759,19 +759,19 @@ ril6inmkn3cqrgca5fq5eek72    worker02    Ready     Active                       
 ![Образы на Hub](../docs/screenshots/hub_images_docker.png)
                                                    
                                                                                                   
-- [x] Перенести docker-compose.yml на manager
+- [x] Перенести docker compose.yml на manager
 ```bash
-rsync -avhP --rsync-path="sudo rsync" "/data/workspace/projects/DO7_Docker_Compose_ID_1219717-1/src/docker-compose-swarm.yml" vagrant@192.168.100.100:/home/vagrant/src/
+rsync -avhP --rsync-path="sudo rsync" "/data/workspace/projects/DO7_Docker_Compose_ID_1219717-1/src/docker compose-swarm.yml" vagrant@192.168.100.100:/home/vagrant/src/
 rsync -avhP --rsync-path="sudo rsync" "/data/workspace/projects/DO7_Docker_Compose_ID_1219717-1/src/.env" vagrant@192.168.100.100:/home/vagrant/src/
 rsync -avhP --rsync-path="sudo rsync" "/data/workspace/projects/DO7_Docker_Compose_ID_1219717-1/src/services/database/init.sql" vagrant@192.168.100.100:/home/vagrant/src/
 ```                                                    
-- [x] docker stack deploy -c docker-compose.yml app
+- [x] docker stack deploy -c docker compose.yml app
 ### Задание 3. Запуск стека сервисов                                                                                   
   #### Развёртывание на кластере                                                                  
                                                                                                   
   Для запуска на кластере Docker Swarm создан отдельный файл
   
-  [docker-compose-swarm.yml](./docker-compose-swarm.yml), адаптированный под swarm mode: 
+  [docker compose-swarm.yml](./docker compose-swarm.yml), адаптированный под swarm mode: 
 
   | Изменение | Причина |                                                                         
   |-----------|---------|                                                                         
@@ -815,7 +815,7 @@ cd src
 
  - [x] Изменить конфиг docker compose
 
- [docker-compose-swarm-nginx.yml](./docker-compose-swarm-nginx.yml)
+ [docker compose-swarm-nginx.yml](./docker compose-swarm-nginx.yml)
 
  - [x] Запустить как сервис в Swarm
 

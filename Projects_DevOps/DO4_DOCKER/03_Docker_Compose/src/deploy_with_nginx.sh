@@ -8,7 +8,7 @@ set -a
 source .env
 set +a
 
-docker stack deploy -c docker-compose-swarm-nginx.yml s21
+docker stack deploy -c docker compose-swarm-nginx.yml s21
 
 sleep 10
 docker stack services s21

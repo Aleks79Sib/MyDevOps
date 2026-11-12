@@ -27,7 +27,7 @@ services:
       - app-network                                                                             
                                                                                                 
   session-service:                                                                              
-    image: htclelik/session-service:latest                                                     
+    image: username/session-service:latest                                                     
     restart: unless-stopped                                                                     
     # ports:                                                                                      
     #   # - "${SESSION_SERVICE_PORT}:8081"
@@ -44,7 +44,7 @@ services:
       - app-network                                                                             
                                                                                                 
   hotel-service:                                                                                
-    image: htclelik/hotel-service:latest                                                       
+    image: username/hotel-service:latest                                                       
     restart: unless-stopped                                                                     
     environment:                                                                                
       POSTGRES_HOST: postgres_s21                                                                   
@@ -58,7 +58,7 @@ services:
       - app-network                                                                             
                                                                                                 
   payment-service:                                                                              
-    image: htclelik/payment-service:latest                                                     
+    image: username/payment-service:latest                                                     
     restart: unless-stopped                                                                     
     environment:                                                                                
       POSTGRES_HOST: postgres_s21                                                                   
@@ -72,7 +72,7 @@ services:
       - app-network                                                                             
                                                                                                 
   loyalty-service:                                                                              
-    image: htclelik/loyalty-service:latest                                                     
+    image: username/loyalty-service:latest                                                     
     restart: unless-stopped                                                                     
     environment:                                                                                
       POSTGRES_HOST: postgres_s21                                                                   
@@ -86,7 +86,7 @@ services:
       - app-network                                                                             
                                                                                                 
   report-service:                                                                               
-    image: htclelik/report-service:latest                                                      
+    image: username/report-service:latest                                                      
     restart: unless-stopped                                                                     
     environment:                                                                                
       POSTGRES_HOST: postgres_s21                                                                   
@@ -106,7 +106,7 @@ services:
       - app-network                                                                             
                                                                                                 
   booking-service:                                                                              
-    image: htclelik/booking-service:latest                                                     
+    image: username/booking-service:latest                                                     
     restart: unless-stopped                                                                     
     environment:                                                                                
       POSTGRES_HOST: postgres_s21                                                                   
@@ -132,7 +132,7 @@ services:
       - app-network                                                                             
                                                                                                 
   gateway-service:                                                                              
-    image: htclelik/gateway-service:latest                                                     
+    image: username/gateway-service:latest                                                     
     restart: unless-stopped                                                                     
     # ports:                                                                                      
     #   # - "${GATEWAY_SERVICE_PORT}:8087"                                                                                      
