@@ -9,7 +9,7 @@ sudo chown -R 999:999 /var/lib/postgresql/data
 ```
 
 ## 2. Запуск контейнера Postgres
-*(через docker-compose или вручную)*
+*(через docker compose или вручную)*
 
 ```bash
 docker compose up -d
@@ -21,27 +21,27 @@ docker compose ps
 **(Если используешь ‼️init.sql, можно пропустить этот шаг).**
 
 ```bash
-docker exec -it postgres psql -U lorydari -c "CREATE DATABASE nextcloud;"
-docker exec -it postgres psql -U lorydari -c "CREATE DATABASE n8n_v2_db;"
-docker exec -it postgres psql -U lorydari -c "CREATE DATABASE \"PSQL_Supabase\";"
+docker exec -it postgres psql -U username -c "CREATE DATABASE DB1;"
+docker exec -it postgres psql -U username -c "CREATE DATABASE DB2;"
+docker exec -it postgres psql -U username -c "CREATE DATABASE \"DB_3_WITH_SPACES\";"
 ```
 
 ## 4. Восстановление дампа (заливка SQL-файла)
 
 ```bash
-docker exec -i postgres psql -U lorydari -d postgres < /путь/к/дампам/postgres_all.sql
+docker exec -i postgres psql -U username -d postgres < /путь/к/дампам/postgres_all.sql
 ```
 
 ## 5. Приведение пароля в соответствие с .env
 
 ```bash
-docker exec -it postgres psql -U lorydari -c "ALTER USER lorydari WITH PASSWORD 'новый_пароль_из_env';"
+docker exec -it postgres psql -U username -c "ALTER USER username WITH PASSWORD 'новый_пароль_из_env';"
 ```
 
 ## 6. Проверка состояния баз
 
 ```bash
-docker exec -it postgres psql -U lorydari -c "\l"
+docker exec -it postgres psql -U username -c "\l"
 ```
 
 ## 7. Полезные команды Работа с PostgreSQL через Docker
@@ -57,7 +57,7 @@ docker exec -it postgres psql -U user -d db -c "SELECT * FROM users LIMIT 5;"
 docker exec -it postgres psql -U user -c "\l"
 
 # Список всех таблиц в конкретной базе
-docker exec -it postgres psql -U user -d n8n -c "\dt"
+docker exec -it postgres psql -U user -d db1 -c "\dt"
 
 # Сделать дамп (бэкап) всей БД
 docker exec postgres pg_dumpall -U user > ~/backup/all_databases.sql
