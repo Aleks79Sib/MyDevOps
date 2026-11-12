@@ -2,7 +2,7 @@
 
 ## 🎯 Цель проекта
 
-Создание мощного домашнего сервера для запуска множества сервисов: Nextcloud, автоматизация (n8n), менеджер паролей (Vaultwarden), медиа-сервер (Jellyfin), умный дом (Home Assistant), торрент-клиент (qBittorrent), мониторинг (Uptime Kuma) и в перспективе — локальный ИИ-ассистент на RTX 3090.
+Создание мощного своего домашнего сервера для запуска множества сервисов: Nextcloud, автоматизация (n8n), менеджер паролей (Vaultwarden), медиа-сервер (Jellyfin), умный дом (Home Assistant), торрент-клиент (qBittorrent), мониторинг (Uptime Kuma) и в перспективе — локальный ИИ-ассистент на RTX 3090.
 
 ---
 
@@ -108,22 +108,22 @@ sudo netbird service start
 4. **Reverse Proxy → Services → Add Service**:
    - Subdomain: `nextcloud`
    - Domain: `proxy.ваш-домен`
-   - Target: `http://IP_сервера:28080` (или `http://nextcloud:80`)
+   - Target: `http://IP_сервера:8080` (или `http://nextcloud:80`)
 
 Доступ по адресу: `https://nextcloud.proxy.ваш-домен`
 
 ---
 
-## 🚨 3. Главная проблема c  Nextcloud:  Error 500
+## 🚨 3. Troubleshooting. Главная проблема c  Nextcloud:  Error 500
 
 ### Описание проблемы
-После смены домена с `nextcloud.envai.win` на `nextcloud.nb.envai.win` и перехода с Cloudflare/SSH-туннеля на NetBird, Nextcloud перестал открываться. При попытке зайти на `/login` выдавалась ошибка HTTP 500 без каких-либо следов в логах.
+После смены домена с `nextcloud.example.com` на `nextcloud.netbird.example.com` и перехода с Cloudflare/SSH-туннеля на NetBird, Nextcloud перестал открываться. При попытке зайти на `/login` выдавалась ошибка HTTP 500 без каких-либо следов в логах.
 
 ### Хронология поиска решения
 
 #### Этап 1: Редиректы и overwritehost
 **Проблема**: Nextcloud редиректил на старый домен.
-**Решение**: Удаление параметра `'overwritehost' => 'nextcloud.envai.win'` из `config.php` и замена `overwrite.cli.url` на новый домен.
+**Решение**: Удаление параметра `'overwritehost' => 'nextcloud.example.com'` из `config.php` и замена `overwrite.cli.url` на новый домен.
 
 #### Этап 2: Синтаксическая ошибка в config.php
 **Проблема**: В массиве `trusted_proxies` была пропущена запятая.
@@ -165,18 +165,13 @@ sudo netbird service start
 
 
 
-## 📚 5. Дополнительные сервисы
+## 📚 5. Возможные дополнительные сервисы
 
 ### Читалки для книг
 
 **В Nextcloud** (установка через магазин приложений):
 - **Reader** (`files_reader`) — EPUB, PDF, CBR, CBZ
 - **EPUB Viewer** (`epubviewer`) — EPUB, PDF, CBR, CBZ, закладки, ночной режим
-
-**В Jellyfin**:
-- Плагин **Bookshelf** для хранения книг
-- Клиент **JellyBook** (Android/iOS) для чтения
-- Плагин **KOFin** для синхронизации с KOReader
 
 ### Рекомендуемые к установке сервисы
 
@@ -210,9 +205,9 @@ docker exec -it nextcloud php /var/www/html/occ config:system:get overwrite.cli.
 ### Настройка Nextcloud через occ
 ```bash
 # Управление параметрами
-docker exec -it nextcloud php /var/www/html/occ config:system:set overwrite.cli.url --value="https://nextcloud.nb.envai.win"
+docker exec -it nextcloud php /var/www/html/occ config:system:set overwrite.cli.url --value="https://nextcloud.netbird.example.com"
 docker exec -it nextcloud php /var/www/html/occ config:system:delete overwritehost
-docker exec -it nextcloud php /var/www/html/occ config:system:set trusted_domains 0 --value="nextcloud.nb.envai.win"
+docker exec -it nextcloud php /var/www/html/occ config:system:set trusted_domains 0 --value="nextcloud.netbird.example.com"
 
 # Управление приложениями
 docker exec -it nextcloud php /var/www/html/occ app:disable --all
