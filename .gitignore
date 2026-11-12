@@ -21,3 +21,6 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+
+# binarny file
+Projects_DevOps/DO4_DOCKER/04_Ansible_Service_Discovery/src/consul01/consul
