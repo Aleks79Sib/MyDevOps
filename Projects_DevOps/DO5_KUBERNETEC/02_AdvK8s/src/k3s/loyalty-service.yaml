@@ -1,0 +1,43 @@
+# loyalty-service.yaml
+# loyalty-service: программа лояльности. Порт 8085, БД balances_db.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loyalty-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loyalty-service
+  template:
+    metadata:
+      labels:
+        app: loyalty-service
+    spec:
+      containers:
+        - name: loyalty-service
+          image: username/loyalty-service:v3.do10_1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8085
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          env:
+            - name: POSTGRES_DB
+              value: "balances_db"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loyalty-service
+spec:
+
+  selector:
+    app: loyalty-service
+  ports:
+    - port: 8085
+      targetPort: 8085

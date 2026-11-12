@@ -1,0 +1,87 @@
+# postgres.yaml
+# Deployment с единственной репликой PostgreSQL + Service для доступа
+# по стабильному DNS-имени "postgres" (см. POSTGRES_HOST в configmap.yaml).
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: "postgres"
+          volumeMounts:
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d
+
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+
+      volumes:
+        - name: init-script
+          configMap:
+            name: postgres-init
+
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+data:
+  init.sql: |
+    \c postgres;
+    DROP DATABASE IF EXISTS users_db;
+    CREATE DATABASE users_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS hotels_db;
+    CREATE DATABASE hotels_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS reservations_db;
+    CREATE DATABASE reservations_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS payments_db;
+    CREATE DATABASE payments_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS balances_db;
+    CREATE DATABASE balances_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS statistics_db;
+    CREATE DATABASE statistics_db OWNER postgres;

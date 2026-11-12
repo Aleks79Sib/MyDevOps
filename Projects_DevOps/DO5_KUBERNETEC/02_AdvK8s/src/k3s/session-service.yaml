@@ -1,0 +1,43 @@
+# session-service.yaml
+# session-service: аутентификация, выдача JWT-токенов. Порт 8081, БД users_db.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: session-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: session-service
+  template:
+    metadata:
+      labels:
+        app: session-service
+    spec:
+      containers:
+        - name: session-service
+          image: username/session-service:v3.do10_1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          env:
+            - name: POSTGRES_DB
+              value: "users_db"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: session-service
+spec:
+  type: ClusterIP
+  selector:
+    app: session-service
+  ports:
+    - port: 8081
+      targetPort: 8081

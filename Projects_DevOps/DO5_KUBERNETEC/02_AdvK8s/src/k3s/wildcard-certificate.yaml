@@ -1,0 +1,25 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-k8s-local
+  namespace: default
+spec:
+  secretName: wildcard-k8s-local-tls
+
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
+
+  commonName: "*.k8s.local"
+
+  dnsNames:
+    - "*.k8s.local"
+    - "k8s.local"
+
+  duration: 2160h
+  renewBefore: 360h
+
+  privateKey:
+    algorithm: RSA
+    size: 2048
