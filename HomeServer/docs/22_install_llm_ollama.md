@@ -16,7 +16,7 @@
 
 ## 🐳 1. Конфигурация Docker Compose
 
-Создайте файл `docker-compose.yml`:
+Создайте файл `docker compose.yml`:
 
 ```yaml
 services:
@@ -165,7 +165,7 @@ docker exec -it ollama ollama run gemma4:e4b "Объясни Docker" --verbose
 ### Настройки `integration_openai`:
 
 ```bash
-docker exec -u www-data nextcloud php occ config:app:set integration_openai url --value="http://192.168.1.100:11434/v1"
+docker exec -u www-data nextcloud php occ config:app:set integration_openai url --value="http://192.168.50.100:11434/v1"
 docker exec -u www-data nextcloud php occ config:app:set integration_openai api_key --value="ollama"
 docker exec -u www-data nextcloud php occ config:app:set integration_openai chat_model --value="gemma4:e4b"
 docker exec -u www-data nextcloud php occ config:app:set integration_openai request_timeout --value="600"
