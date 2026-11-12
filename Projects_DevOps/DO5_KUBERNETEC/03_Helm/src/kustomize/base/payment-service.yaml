@@ -1,0 +1,43 @@
+# payment-service.yaml
+# payment-service: обработка платежей. Порт 8084, БД payments_db.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: username/payment-service:v3.do10_1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          env:
+            - name: POSTGRES_DB
+              value: "payments_db"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+spec:
+
+  selector:
+    app: payment-service
+  ports:
+    - port: 8084
+      targetPort: 8084

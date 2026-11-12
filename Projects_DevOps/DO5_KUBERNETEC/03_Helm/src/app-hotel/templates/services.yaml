@@ -1,0 +1,53 @@
+{{- range $name, $service := .Values.services }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels:
+    app: {{ $name }}
+spec:
+  type: {{ $service.service.type }}
+  selector:
+    app: {{ $name }}
+  ports:
+    - port: {{ $service.service.port }}
+      targetPort: {{ $service.containerPort }}
+      protocol: TCP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  labels:
+    app: {{ $name }}
+spec:
+  replicas: {{ $service.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+    spec:
+      containers:
+        - name: {{ $name }}
+          image: "{{ $service.image.repository }}:{{ $service.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ $service.containerPort }}
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: {{ $.Values.secrets.existingSecret }}
+          {{- if $service.postgresDb }}
+          env:
+            - name: POSTGRES_DB
+              value: "{{ $service.postgresDb }}"
+          {{- end }}
+
+{{- end }}

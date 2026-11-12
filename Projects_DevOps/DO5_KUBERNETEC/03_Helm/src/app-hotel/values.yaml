@@ -1,0 +1,110 @@
+services:
+  booking-service:
+    replicaCount: 1
+    image:
+      repository: username/booking-service
+      tag: v3.do10_1.0
+    containerPort: 8083
+    service:
+      type: ClusterIP
+      port: 8083
+    postgresDb: reservations_db
+
+  gateway-service:
+    replicaCount: 1
+    image:
+      repository: username/gateway-service
+      tag: v3.do10_1.0
+    containerPort: 8087
+    service:
+      type: ClusterIP
+      port: 8087
+
+  hotel-service:
+    replicaCount: 1
+    image:
+      repository: username/hotel-service
+      tag: v3.do10_1.0
+    containerPort: 8082
+    service:
+      type: ClusterIP
+      port: 8082
+    postgresDb: hotels_db
+
+  loyalty-service:
+    replicaCount: 3 #1
+    image:
+      repository: username/loyalty-service
+      tag: v3.do10_1.0
+    containerPort: 8085
+    service:
+      type: ClusterIP
+      port: 8085
+    postgresDb: balances_db
+
+  payment-service:
+    replicaCount: 1
+    image:
+      repository: username/payment-service
+      tag: v3.do10_1.0
+    containerPort: 8084
+    service:
+      type: ClusterIP
+      port: 8084
+    postgresDb: payments_db
+
+  report-service:
+    replicaCount: 2 #1
+    image:
+      repository: username/report-service
+      tag: v3.do10_1.0
+    containerPort: 8086
+    service:
+      type: ClusterIP
+      port: 8086
+    postgresDb: statistics_db
+
+  session-service:
+    replicaCount: 1
+    image:
+      repository: username/session-service
+      tag: v3.do10_1.0
+    containerPort: 8081
+    service:
+      type: ClusterIP
+      port: 8081
+    postgresDb: users_db
+
+postgres:
+  image:
+    repository: postgres
+    tag: "15"
+  port: 5432
+  storage: 5Gi
+
+rabbitmq:
+  image: rabbitmq:3-management
+  amqpPort: 5672
+  managementPort: 15672
+
+config:
+  postgres:
+    host: postgres
+    port: "5432"
+
+  rabbitmq:
+    host: rabbitmq
+    port: "5672"
+    queueName: statistics-queue
+    exchange: statistics-exchange
+
+secrets:
+  existingSecret: app-secret
+
+ingress:
+  enabled: true
+  className: nginx
+  host: app.k8s.local
+  tls:
+    enabled: true
+    secretName: wildcard-k8s-local-tls

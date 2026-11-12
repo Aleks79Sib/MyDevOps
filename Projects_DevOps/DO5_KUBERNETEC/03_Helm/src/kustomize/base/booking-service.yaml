@@ -1,0 +1,43 @@
+# booking-service.yaml
+# booking-service: оформление бронирований. Порт 8083, БД reservations_db.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-service
+  template:
+    metadata:
+      labels:
+        app: booking-service
+    spec:
+      containers:
+        - name: booking-service
+          image: username/booking-service:v3.do10_1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          env:
+            - name: POSTGRES_DB
+              value: "reservations_db"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-service
+spec:
+
+  selector:
+    app: booking-service
+  ports:
+    - port: 8083
+      targetPort: 8083

@@ -1,0 +1,43 @@
+# report-service.yaml
+# report-service: формирование статистики. Порт 8086, БД statistics_db.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: report-service
+  template:
+    metadata:
+      labels:
+        app: report-service
+    spec:
+      containers:
+        - name: report-service
+          image: username/report-service:v3.do10_1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8086
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          env:
+            - name: POSTGRES_DB
+              value: "statistics_db"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: report-service
+spec:
+
+  selector:
+    app: report-service
+  ports:
+    - port: 8086
+      targetPort: 8086

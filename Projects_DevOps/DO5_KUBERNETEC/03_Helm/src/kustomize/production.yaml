@@ -1,0 +1,521 @@
+apiVersion: v1
+data:
+  BOOKING_SERVICE_HOST: booking-service
+  BOOKING_SERVICE_PORT: "8083"
+  GATEWAY_SERVICE_HOST: gateway-service
+  GATEWAY_SERVICE_PORT: "8087"
+  HOTEL_SERVICE_HOST: hotel-service
+  HOTEL_SERVICE_PORT: "8082"
+  LOYALTY_SERVICE_HOST: loyalty-service
+  LOYALTY_SERVICE_PORT: "8085"
+  PAYMENT_SERVICE_HOST: payment-service
+  PAYMENT_SERVICE_PORT: "8084"
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: "5432"
+  RABBIT_MQ_EXCHANGE: statistics-exchange
+  RABBIT_MQ_HOST: rabbitmq
+  RABBIT_MQ_PORT: "5672"
+  RABBIT_MQ_QUEUE_NAME: statistics-queue
+  REPORT_SERVICE_HOST: report-service
+  REPORT_SERVICE_PORT: "8086"
+  SESSION_SERVICE_HOST: session-service
+  SESSION_SERVICE_PORT: "8081"
+kind: ConfigMap
+metadata:
+  name: app-config
+---
+apiVersion: v1
+data:
+  init.sql: |
+    \c postgres;
+    DROP DATABASE IF EXISTS users_db;
+    CREATE DATABASE users_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS hotels_db;
+    CREATE DATABASE hotels_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS reservations_db;
+    CREATE DATABASE reservations_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS payments_db;
+    CREATE DATABASE payments_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS balances_db;
+    CREATE DATABASE balances_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS statistics_db;
+    CREATE DATABASE statistics_db OWNER postgres;
+kind: ConfigMap
+metadata:
+  name: postgres-init
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+stringData:
+  BOOKING_SERVICE_UUID: 911ccb4c-c055-11eb-8529-0242ac130003
+  GATEWAY_SERVICE_UUID: b51ceda2-bfa5-11eb-8529-0242ac130003
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_USER: postgres
+  PRIVATE_KEY: |
+    MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC9Q1hl6ossCg5T
+    r43IW0px2Wz0tDOKRHncreZcew3G+63QuXrLSb5BRh24q0ej4W+Wj8/6RR6vwG1h
+    FtPIBqy6OYUvEdBmOay9eEpzQc2Xy253qSQyxco4FmyNLAwfyk0JS5DKdagT6ct3
+    AqQe9+oGsEHf18CWD/dnYrfKI644uqniI3Lzrk+YnIwZ8BChKMN40qd7XkRuWsJB
+    GEJr+hp1F1KvaYbPz/gqvBJS+IlG37/6mO1xoMaDfPxEUCJbHiWS8PcSeC9TllVV
+    tC+oyPnQzYEbBh7ZfxbwAD3y5FW3qxWN33sQ53XaH7zHondMAQJ6hQROCb6Ml/0b
+    BKfU0hz9AgMBAAECggEANI56Arsx8IXOWrDaZ3PqZVkiZ4WO9mtzh7OGz9GgDsyf
+    BOIs1jzhJ1EoObrehwS4LxA6id4d2mJOPXLQVrB70K7ebCa/P1PuwyKfUghI5kko
+    oPQISE0ijZa0iDNeHonYAKfKSl6H0RfQV3kVSEBB7Z+Oe3F3WnSOmFgSf4CPBdNc
+    240kanQlxsmKjsDmsxLePiYNxU6vDoZt/JKQmSwQUIgznMm7upEmh3UR8q7N757I
+    +dTEhGxs8LLGyvJ2nGnolH9fpkXJlAKHAUvnX1NfUkCgIGiVqpsxwHb5jTmjqpH1
+    U8usaSPZDD0uLf4DLUjIgddpSGcUIjKlaNO9sQXsBQKBgQD5XpNMqgIZgtfEOVJ4
+    4auMZqCsIuKXwsICNZmeqSkv5J29ov3V/fkBjDpwiyEXO/9HeFOUEGSNGeFPF4ha
+    0KnNFmeTwDCIPA2vyF3Z049GfRytc4qDqwdplVjgPBPKfrGNmGdHlKKoEHGjpWnu
+    JgOkNhenPKG7zbevpty7TqgluwKBgQDCS6JEl9j34gp5+MoxIbkXt1WOwngnFwRs
+    cklTEGJ4wZ3i6GtKIOVzYd7VDqgomB/jnkDQlBK47OzAA54bJBkJ6w83cDGR8D51
+    axYKgKG+Kd8EOeEN4PY+jjKyUpKU3o8o++JKEKs8J2raemb+5YlgiY1ZeDNhL4Lr
+    UVa3cIyApwKBgGXo56u6AreoSENx5alvGGt9eYY/j3jT5/N9MjWsDh/7fxeD59av
+    PzcJtsxNn41eQJpVq1pkRKOBgxmOlXP/uJUO5e906KCUYkeHTAt8MR5ufOzJvj7H
+    A3V7ymGBS9lCY49pTDPto3epmLd3H05rDKvsS0hWOAaHMN1BBQ4rO/6HAoGAMQJI
+    /QpcZTJ0OA4EWl5KROwuvaLaEeohaIVvb29bl2AnRjwgDAO+PNt8DLv0uMCekpix
+    eqtPCaxhj5GaCPiTBEhxfydiqZAzAQUw+xc1NTV0lqlO1mRfWKofqZFgfgKhk9Ht
+    Y4dO2g6LSm7DmhomC97Gc8H5G9OTL25F9GGEX1MCgYEA5CkqAvlJfyCm5lGp2gLM
+    fwElF1oYtgC5xRDpzI6DnMjKhUxeJaMgRkam3mvMA0zg58ZTY9q+CeSSyDohNZpL
+    DZomG7mEuNDWAPbpafo9g8q1g7ucWGeFRgVAmf0xmnJHHmAqODdT9X02abJZMuma
+    wCRDtRpPKvNtamO9jex9YgM=
+  PUBLIC_KEY: |
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvUNYZeqLLAoOU6+NyFtK
+    cdls9LQzikR53K3mXHsNxvut0Ll6y0m+QUYduKtHo+Fvlo/P+kUer8BtYRbTyAas
+    ujmFLxHQZjmsvXhKc0HNl8tud6kkMsXKOBZsjSwMH8pNCUuQynWoE+nLdwKkHvfq
+    BrBB39fAlg/3Z2K3yiOuOLqp4iNy865PmJyMGfAQoSjDeNKne15EblrCQRhCa/oa
+    dRdSr2mGz8/4KrwSUviJRt+/+pjtcaDGg3z8RFAiWx4lkvD3EngvU5ZVVbQvqMj5
+    0M2BGwYe2X8W8AA98uRVt6sVjd97EOd12h+8x6J3TAECeoUETgm+jJf9GwSn1NIc
+    /QIDAQAB
+  RABBIT_MQ_PASSWORD: guest
+  RABBIT_MQ_USER: guest
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-service
+spec:
+  ports:
+  - port: 8083
+    targetPort: 8083
+  selector:
+    app: booking-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+spec:
+  ports:
+  - port: 8087
+    targetPort: 8087
+  selector:
+    app: gateway-service
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hotel-service
+spec:
+  ports:
+  - port: 8082
+    targetPort: 8082
+  selector:
+    app: hotel-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loyalty-service
+spec:
+  ports:
+  - port: 8085
+    targetPort: 8085
+  selector:
+    app: loyalty-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+spec:
+  ports:
+  - port: 8084
+    targetPort: 8084
+  selector:
+    app: payment-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  ports:
+  - name: amqp
+    port: 5672
+    targetPort: 5672
+  - name: management
+    port: 15672
+    targetPort: 15672
+  selector:
+    app: rabbitmq
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: report-service
+spec:
+  ports:
+  - port: 8086
+    targetPort: 8086
+  selector:
+    app: report-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: session-service
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8081
+  selector:
+    app: session-service
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-path
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-service
+  template:
+    metadata:
+      labels:
+        app: booking-service
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: reservations_db
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secret
+        image: username/booking-service:v3.do10_1.0
+        imagePullPolicy: IfNotPresent
+        name: booking-service
+        ports:
+        - containerPort: 8083
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secret
+        image: username/gateway-service:v3.do10_1.0
+        imagePullPolicy: IfNotPresent
+        name: gateway-service
+        ports:
+        - containerPort: 8087
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hotel-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hotel-service
+  template:
+    metadata:
+      labels:
+        app: hotel-service
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: hotels_db
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secret
+        image: username/hotel-service:v3.do10_1.0
+        imagePullPolicy: IfNotPresent
+        name: hotel-service
+        ports:
+        - containerPort: 8082
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loyalty-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loyalty-service
+  template:
+    metadata:
+      labels:
+        app: loyalty-service
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: balances_db
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secret
+        image: username/loyalty-service:v3.do10_1.0
+        imagePullPolicy: IfNotPresent
+        name: loyalty-service
+        ports:
+        - containerPort: 8085
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: payments_db
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secret
+        image: username/payment-service:v3.do10_1.0
+        imagePullPolicy: IfNotPresent
+        name: payment-service
+        ports:
+        - containerPort: 8084
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_USER
+              name: app-secret
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: app-secret
+        - name: POSTGRES_DB
+          value: postgres
+        image: postgres:15
+        name: postgres
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d
+          name: init-script
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-data
+      volumes:
+      - configMap:
+          name: postgres-init
+        name: init-script
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - env:
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              key: RABBIT_MQ_USER
+              name: app-secret
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              key: RABBIT_MQ_PASSWORD
+              name: app-secret
+        image: rabbitmq:3-management
+        name: rabbitmq
+        ports:
+        - containerPort: 5672
+        - containerPort: 15672
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: report-service
+  template:
+    metadata:
+      labels:
+        app: report-service
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: statistics_db
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secret
+        image: username/report-service:v3.do10_1.0
+        imagePullPolicy: IfNotPresent
+        name: report-service
+        ports:
+        - containerPort: 8086
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: session-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: session-service
+  template:
+    metadata:
+      labels:
+        app: session-service
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: users_db
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secret
+        image: username/session-service:v3.do10_1.0
+        imagePullPolicy: IfNotPresent
+        name: session-service
+        ports:
+        - containerPort: 8081
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gateway-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: app.k8s.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: session-service
+            port:
+              number: 8081
+        path: /api/v1/auth
+        pathType: Prefix
+      - backend:
+          service:
+            name: gateway-service
+            port:
+              number: 8087
+        path: /api/v1/gateway
+        pathType: Prefix
+  tls:
+  - hosts:
+    - app.k8s.local
+    secretName: wildcard-k8s-local-tls
