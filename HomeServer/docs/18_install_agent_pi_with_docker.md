@@ -6,7 +6,7 @@
 
 ```bash
 # 1. Копируем на сервер
-scp -r /Users/leik.van-23/AGENTS/pi_demo/home-server user@server:~/
+scp -r ~/AGENTS/pi_demo/home-server user@server:~/
 
 # 2. Заходим на сервер
 ssh user@server
@@ -69,7 +69,7 @@ docker compose run --rm pi -p "Привет"
 pi -r
 
 # Или открыть конкретную
-pi --session 019ea8d3-82e7-7910-89f4-79f0c40f83db
+pi --session 01df8d3-82e7-7910-89f4-79sdfdsff
 ```
 
 Если хочешь, чтобы сессии отображались в `/resume` как родные —
@@ -77,7 +77,7 @@ pi --session 019ea8d3-82e7-7910-89f4-79f0c40f83db
 
 ```bash
 # На сервере, внутри home-server/
-mv sessions/--Users-leik.van-23-AGENTS-pi_demo-- sessions/--workspace--
+mv sessions/--Users-username-AGENTS-pi_demo-- sessions/--workspace--
 ```
 
 После этого `/resume` покажет их как местные.
@@ -91,16 +91,16 @@ mv sessions/--Users-leik.van-23-AGENTS-pi_demo-- sessions/--workspace--
 ```yaml
 ingress:
   # Pi Agent — SSH
-  - hostname: pi.envai.win
+  - hostname: pi.example.com
     service: ssh://localhost:2222
     originRequest:
       noTLSVerify: true
       connectTimeout: 30s
-      httpHostHeader: pi.envai.win
-      originServerName: pi.envai.win
+      httpHostHeader: pi.example.com
+      originServerName: pi.example.com
 
   # Playwright MCP (опционально — только с Cloudflare Access!)
-  - hostname: mcp.envai.win
+  - hostname: mcp.example.com
     service: http://localhost:3100
     originRequest:
       noTLSVerify: true
@@ -181,21 +181,3 @@ ingress:
 | **stop_grace_period** | 30s на корректное завершение | 🟢 |
 | **ulimits** | Playwright: nofile/nproc | 🟢 |
 
-## Что остаётся на тебе
-
-- API-ключи в `.env` — не давать никому доступ к этому файлу
-- Сессии в volume `pi-agent-home` — могут содержать ключи
-- Playwright — если открываешь через туннель, настрой Cloudflare Access
-- Версия `playwright-mcp@latest` — можно зафиксировать, если хочешь
-
-## Может ли Pi навредить?
-
-| Действие | Возможно? |
-|----------|-----------|
-| Прочитать `/etc/shadow` хоста | ❌ Нет, ФС изолирована |
-| Записать файл вне проекта | ❌ Только в `/workspace` |
-| Удалить системные файлы | ❌ Rootfs read-only |
-| Запустить Docker | ❌ Нет docker.sock |
-| Прочитать твои API-ключи | 🟡 Из сессий на volume да, из .env нет |
-| Выйти в интернет | ✅ Через Playwright (нужно для работы) |
-| Сделать скриншот сайта | ✅ Для этого и ставится |
