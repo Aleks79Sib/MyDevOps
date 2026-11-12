@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loyalty-service
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate # Стратегия Rolling Update
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: loyalty-service
+  template:
+    metadata:
+      labels:
+        app: loyalty-service
+    spec:
+      containers:
+        - name: loyalty-service
+          image: username/loyalty-service:v4.do10 # Заменили образ
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8085
+
+          readinessProbe: # Добавили пробу readinessProbe
+            tcpSocket:
+              port: 8085
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            failureThreshold: 30
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+          env:
+            - name: POSTGRES_DB
+              value: "balances_db"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loyalty-service
+spec:
+  type: NodePort
+  selector:
+    app: loyalty-service
+  ports:
+    - port: 8085
+      targetPort: 8085
