@@ -9,7 +9,7 @@
 ### 📍 Конфигурация сервера
 
 - IP: 10.zzz.zzz.zzz (публичный)
-- Домен: nb.example.com
+- Домен: netbird.example.com
 - DNS-провайдер: Cloudflare (серое облако — DNS only)
 - Reverse proxy: Traefik v3.6 (обязательно!)
 - Docker-сеть: netbird (subnet 172.30.0.0/24)
@@ -20,8 +20,8 @@
 
 Перед запуском скрипта создайте DNS-записи: 
 ```
-A nb.example.com → IP сервера и 
-CNAME *.nb.example.com → nb.example.com (DNS only, если у вас Cloudflare).
+A netbird.example.com → IP сервера и 
+CNAME *.netbird.example.com → netbird.example.com (DNS only, если у вас Cloudflare).
 ```
 Остановите стек и уберите ручные файлы. 
 Скрипт не перезаписывает существующую установку: если в каталоге уже лежит сгенерированный config.yaml, он остановится.
@@ -32,25 +32,25 @@ cd .. && mkdir netbird && cd netbird   # чистый каталог
 ```
 Запустите скрипт. Выберите вариант [0] (встроенный Traefik) и на вопрос про proxy ответьте y, если хотите reverse proxy:
 ```bash
-export NETBIRD_DOMAIN=nb.example.com
+export NETBIRD_DOMAIN=netbird.example.com
 export NETBIRD_LETSENCRYPT_EMAIL=you@email.com
 export NETBIRD_ENABLE_PROXY=true
 curl -fsSL https://github.com/netbirdio/netbird/releases/latest/download/getting-started.sh | bash
 ```
 Или запустите скрипт без переменных, и он задаст вопросы интерактивно.
 
-Откройте https://nb.example.com. Вас перебросит на /setup, где нужно создать админа (email, имя, пароль).
+Откройте https://netbird.example.com. Вас перебросит на /setup, где нужно создать админа (email, имя, пароль).
 
 ```bash
 ~/docker/netbird-server/
-├── docker-compose.yml
+├── docker compose.yml
 ├── config.yaml           # Конфиг NetBird Management + Signal
 ├── dashboard.env         # Переменные окружения для Dashboard
 └── volumes:
     ├── netbird_data
     └── netbird_traefik_letsencrypt
 ```
-- 📄 docker-compose.yml — финальная рабочая версия
+- 📄 docker compose.yml — финальная рабочая версия
 ```yaml
 services:
   # ==================== Traefik ====================
@@ -97,7 +97,7 @@ services:
       - ./dashboard.env
     labels:
       - traefik.enable=true
-      - traefik.http.routers.netbird-dashboard.rule=Host(`nb.example.com`)
+      - traefik.http.routers.netbird-dashboard.rule=Host(`netbird.example.com`)
       - traefik.http.routers.netbird-dashboard.entrypoints=websecure
       - traefik.http.routers.netbird-dashboard.tls=true
       - traefik.http.routers.netbird-dashboard.tls.certresolver=letsencrypt
@@ -119,13 +119,13 @@ services:
     command: ["--config", "/etc/netbird/config.yaml"]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.netbird-grpc.rule=Host(`nb.example.com`) && (PathPrefix(`/signalexchange.v2.SignalExchange/`) || PathPrefix(`/api`))
+      - traefik.http.routers.netbird-grpc.rule=Host(`netbird.example.com`) && (PathPrefix(`/signalexchange.v2.SignalExchange/`) || PathPrefix(`/api`))
       - traefik.http.routers.netbird-grpc.entrypoints=websecure
       - traefik.http.routers.netbird-grpc.tls=true
       - traefik.http.routers.netbird-grpc.tls.certresolver=letsencrypt
       - traefik.http.routers.netbird-grpc.service=netbird-server-h2c
       - traefik.http.routers.netbird-grpc.priority=100
-      - traefik.http.routers.netbird-backend.rule=Host(`nb.example.com`) && (PathPrefix(`/relay`) || PathPrefix(`/management.ManagementService/`))
+      - traefik.http.routers.netbird-backend.rule=Host(`netbird.example.com`) && (PathPrefix(`/relay`) || PathPrefix(`/management.ManagementService/`))
       - traefik.http.routers.netbird-backend.entrypoints=websecure
       - traefik.http.routers.netbird-backend.tls=true
       - traefik.http.routers.netbird-backend.tls.certresolver=letsencrypt
@@ -144,9 +144,9 @@ services:
     environment:
       NB_PROXY_CERTIFICATE_DIRECTORY: /certs
       NB_PROXY_ALLOW_INSECURE: "true"
-      NB_PROXY_MANAGEMENT_ADDRESS: "https://nb.example.com"
+      NB_PROXY_MANAGEMENT_ADDRESS: "https://netbird.example.com"
       NB_PROXY_ACME_CERTIFICATES: "true"
-      NB_PROXY_DOMAIN: "nb.example.com"
+      NB_PROXY_DOMAIN: "netbird.example.com"
       NB_PROXY_LOG_LEVEL: info
       NB_PROXY_TOKEN: "nbx_ВАШ_ТОКЕН_ИЗ_АДМИНКИ"
       NB_PROXY_PRIVATE: "true"
@@ -180,15 +180,13 @@ networks:
 
 ### ⚠️ Проблемы и решения на RSB
 
-![проблемы и решение](./images/ProblemsRSB.png)
-
 ## 2. Установка NetBird на HS (домашний сервер)
 
 ### 📍 Конфигурация сервера
 
 - CPU: AMD Ryzen 7 7700X (со встроенной графикой RDNA 2)
 - ОС: Linux (за NAT роутера)
-- Пользователь: lorydari
+- Пользователь: username
 - Docker-сервисы: Nextcloud, Vaultwarden, Adminer, n8n, Postgres, Jellyfin, qBittorrent
 
 ### 📁 Где хранится NetBird
@@ -200,7 +198,7 @@ networks:
 /var/log/syslog | grep netbird
 
 # Docker-контейнеры сервисов
-~/docker/server/docker-compose.yml
+~/docker/server/docker compose.yml
 
 # Данные Nextcloud
 /var/lib/nextcloud/         # приложение
@@ -219,15 +217,15 @@ networks:
 curl -fsSL https://pkgs.netbird.io/install.sh | sh
 
 # Подключение к self-hosted серверу
-sudo netbird up --management-url https://nb.example.com
+sudo netbird up --management-url https://netbird.example.com
 
 # Проверка статуса
 sudo netbird status
 ```
 
-После подключения HS получает NetBird IP вида 100.64.x.x и появляется в веб-админке https://nb.example.com → Peers.
+После подключения HS получает NetBird IP вида 100.64.x.x и появляется в веб-админке https://netbird.example.com → Peers.
 
-### 🐳 Пример docker-compose.yml для сервисов HS
+### 🐳 Пример docker compose.yml для сервисов HS
 
 ```yaml
 services:
@@ -300,51 +298,45 @@ networks:
 ```
 ### ⚠️ Проблемы и решения на HS
 
-![Проблемы и решения на HS](./images/ProblemsHS.png)
-
 ## 3. Настройка Reverse Proxy с поддоменами
 
 ### 🌐 DNS-записи в Cloudflare
 
 Type   Name     Content           Proxy
 A      nb   10.zzz.zzz.zzz.   🟥 DNS only
-CNAME  *.nb   nb.example.com.    🟥 DNS only
+CNAME  *.nb   netbird.example.com.    🟥 DNS only
 
 Важно: Серое облако (DNS only) — трафик идёт напрямую на RSB, минуя Cloudflare.
 
 ### 🗝️ Получение токена для Reverse Proxy
 
-- Открой https://nb.example.com → Reverse Proxy → Clusters
+- Открой https://netbird.example.com → Reverse Proxy → Clusters
 - Нажми Setup Self-Hosted Cluster
-- Введи домен: nb.example.com
+- Введи домен: netbird.example.com
 - Сгенерируй token → скопируй его сразу (показывается один раз!)
-- Вставь токен в NB_PROXY_TOKEN в docker-compose.yml на RSB
+- Вставь токен в NB_PROXY_TOKEN в docker compose.yml на RSB
 
 ### 🔧 Создание сервисов
 
 В админке NetBird → Reverse Proxy → Services → Add Service:
 
-![Table Proxy](./images/proxy.png)
-
 ### Итоговые URL
 
 ```
-https://Vaultwarden.nb.example.com        → Vaultwarden
-https://nextcloud.nb.example.com          → Nextcloud
-https://qbittorrent.nb.example.com        → qBittorrent
-https://Jellyfin.nb.example.com           → Jellyfin
-https://adminer.nb.example.com            → Adminer
-https://n8n.nb.example.com                → n8n
+https://Vaultwarden.netbird.example.com        → Vaultwarden
+https://nextcloud.netbird.example.com          → Nextcloud
+https://qbittorrent.netbird.example.com        → qBittorrent
+https://Jellyfin.netbird.example.com           → Jellyfin
+https://adminer.netbird.example.com            → Adminer
+https://n8n.netbird.example.com                → n8n
 ```
 ### ⚠️ Проблемы и решения Reverse Proxy
-
-![Proplems](./images/ProblemsProxy.png)
 
 ## 4. Решённые проблемы с приложениями
 
 ### 🟢 Nextcloud — ошибка 500 (финальная причина)
 
-- Симптом: При открытии https://nextcloud.nb.example.com/login возвращается пустой HTTP 500 без записей в nextcloud.log.
+- Симптом: При открытии https://nextcloud.netbird.example.com/login возвращается пустой HTTP 500 без записей в nextcloud.log.
 
 - Реальная причина: Параметр forwarded_for_headers в config.php был записан как строка "HTTP_X_FORWARDED_FOR" вместо массива ["HTTP_X_FORWARDED_FOR"].
 
@@ -380,7 +372,7 @@ docker restart nextcloud
 array (
   0 => 'localhost',
   1 => '100.xxx.xxx.xxx',         # NetBird IP HS
-  2 => 'nextcloud.nb.example.com', # Публичный домен
+  2 => 'nextcloud.netbird.example.com', # Публичный домен
 ),
 'trusted_proxies' => 
 array (
@@ -388,8 +380,8 @@ array (
   1 => '172.16.0.0/12',          # Docker networks
 ),
 'overwriteprotocol' => 'https',
-'overwritehost' => 'nextcloud.nb.example.com',
-'overwrite.cli.url' => 'https://nextcloud.nb.example.com',
+'overwritehost' => 'nextcloud.netbird.example.com',
+'overwrite.cli.url' => 'https://nextcloud.netbird.example.com',
 'force_ssl' => false,            # TLS терминирует NetBird proxy
 ```
 ### 🟢 Jellyfin — видео не воспроизводилось
@@ -401,7 +393,7 @@ array (
 
 - Решение:
 ```yaml
-# В docker-compose.yml для Jellyfin:
+# В docker compose.yml для Jellyfin:
 devices:
   - /dev/dri/renderD128:/dev/dri/renderD128
   - /dev/dri/card0:/dev/dri/card0
@@ -420,7 +412,7 @@ group_add:
 
 - Симптом: В логах unknown content type: "application/json", OPTIONS method not allowed.
 - Причина: Встроенные защиты qBittorrent (CSRF, Clickjacking) блокировали запросы от reverse proxy.
-- Решение: Остановить контейнер, добавить в /home/lorydari/docker/qBittorrent/config/qBittorrent.conf:
+- Решение: Остановить контейнер, добавить в ~/docker/qBittorrent/config/qBittorrent.conf:
 
 ```ini
 [Preferences]
@@ -444,7 +436,7 @@ WebUI\ServerDomains=*
 [RSB: 10.zzz.zzz.zzz]
 ┌──────────────────────────────────────────────────────────┐
 │  Traefik (:80, :443)                                      │
-│    ↓ TLS passthrough для *.nb.example.com                   │
+│    ↓ TLS passthrough для *.netbird.example.com                   │
 │  netbird-reverse-proxy                                    │
 │    → TLS-терминация (Let's Encrypt)                       │
 │    → WireGuard туннель к HS                               │
@@ -457,12 +449,12 @@ WebUI\ServerDomains=*
 ┌──────────────────────────────────────────────────────────┐
 │  NetBird agent (WireGuard peer)                           │
 │  Docker контейнеры:                                       │
-│    - Nextcloud        :49880 → nextcloud.nb.example.com    │
-│    - Vaultwarden      :49080 → vault.nb.example.com        │
-│    - Jellyfin         :8096  → media.nb.example.com        │
-│    - qBittorrent      :42080 → qbittorrent.nb.example.com  │
-│    - n8n              :15678 → n8n.nb.example.com          │
-│    - Adminer          :18080 → adminer.nb.example.com      │
+│    - Nextcloud        :4880 → nextcloud.netbird.example.com    │
+│    - Vaultwarden      :8080 → vault.netbird.example.com        │
+│    - Jellyfin         :8096  → media.netbird.example.com        │
+│    - qBittorrent      :8080 → qbittorrent.netbird.example.com  │
+│    - n8n              :5678 → n8n.netbird.example.com          │
+│    - Adminer          :8080 → adminer.netbird.example.com      │
 │    - Postgres         (только docker-сеть)                │
 └──────────────────────────────────────────────────────────┘
 ```
