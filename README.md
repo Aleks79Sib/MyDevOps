@@ -123,8 +123,8 @@
 - Секреты [VaultWarden](./HomeServer/docs/12-vaultwarden.md)
 
 - [Монтирование дисков](./HomeServer/docs/16-disk-mount-raid_array.md)
-- [qBittorrent](./HomeServer/docs/23_install_qbittorrent.md)
-- [Jellifin](./HomeServer/docs/24_install_Jellyfin.md)
+- [qBittorrent]
+- [Jellifin]
 
 ### 7. Развертывание ИИ агентов и различные модели 
 
@@ -132,7 +132,7 @@
 
 - [Agent PI](./HomeServer/docs/18_install_agent_pi_with_docker.md)
 - [OLLAMA](./HomeServer/docs/22_install_llm_ollama.md)
-- [Llama.cp](Инструкция в разработке ...)
+- [Llama.cp]
 
 ### 8. [Monitoring](./HomeServer/docs/13-monitoring.md)
 
